@@ -40,3 +40,5 @@
 .entryLink>.sourceBadge{display:inline-block;margin-top:6px}.source-ai{background:#d9efec;color:#205e55}.source-unknown{background:#eceeea;color:#505950}
 
 #chefLinkFields,#chefReviewFields{border:0;padding:0;margin:0;min-width:0}.chefIngredient{border-top:1px solid #d9ded5;padding:18px 0}.chefIngredient button{margin:8px 8px 0 0}#recipeSourceLink{display:inline-block;margin:8px 0}#recipeSourceLink[hidden]{display:none}
+
+#synFields{border:0;padding:0;margin:0;min-width:0}#synList strong,#synLearnedList strong{overflow-wrap:anywhere}#synList .sourceBadge,#synLearnedList .sourceBadge{display:inline-block;margin-bottom:10px}

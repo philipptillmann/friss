@@ -1,3 +1,10 @@
+## 1.36.0 — BLS-Synonyme und Suchvorschläge verwalten
+
+- #80: Einstellungen zum Anlegen, Bearbeiten und Löschen eigener Suchbegriffe mit explizitem BLS-Ziel und Suchsprache ergänzen.
+- Eigene Synonyme funktionieren unabhängig vom BLS-Namen, auch beim Antippen von Wortanfängen, und stehen vor automatisch gelernten Vorschlägen.
+- Gelernte Zuordnungen quellenübergreifend anzeigen, ohne doppelte Zählung gemeinsamer BLS-Klicks; einzelne Zuordnungen vergessen oder in ein eigenes BLS-Synonym umwandeln.
+- Synonyme versioniert speichern und in ZIP-Backups sichern; ältere Sicherungen ohne Synonyme weiterhin unterstützen. Bereits gebuchte Nährwerte bleiben unverändert.
+
 ## 1.35.0 — Chefkoch-Rezeptimport
 
 - #79: Chefkoch-Link auf der Rezeptseite laden, Titel/Portionen/Zutaten/Zubereitung vor dem Speichern bearbeiten und als neues Rezept übernehmen.

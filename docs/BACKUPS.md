@@ -6,7 +6,7 @@ Available from v1.32.0 under **Settings → Backup and restore** (Deutsch: **Ein
 
 Choose **Download backup** and save the ZIP in Files on your iPhone or another device. It contains:
 
-- `backup.json`: versioned `friss-backup-v1` JSON with the effective BLS/food database, diary entries and nutrient snapshots, food/drink recipes, own foods, favorites, settings/goals/BAC profile, quick-add definitions and base64-encoded images, learned searches, JSON-import batches and Apple Health export records/status.
+- `backup.json`: versioned `friss-backup-v1` JSON with the effective BLS/food database, diary entries and nutrient snapshots, food/drink recipes, own foods, favorites, settings/goals/BAC profile, quick-add definitions and base64-encoded images, custom BLS synonyms, learned searches, JSON-import batches and Apple Health export records/status.
 - `files/originals/`: original input JSON/text/photos and preserved AI requests.
 - `files/bls/`: source BLS JSON files, if present.
 - An attachment manifest in the JSON with byte lengths and SHA-256 checksums.
@@ -42,3 +42,5 @@ All endpoints require the existing Friss authentication (Bearer API key or same-
 - `POST /backups/restore`: same raw ZIP, plus `X-Friss-Restore: replace`. Returns `restored: true`, counts and relative `recovery_backup` path. This header is explicit replacement intent, not a second authentication factor.
 
 These ZIP backups are separate from nutrition JSON imports and Apple Health day exports. A `friss-meal-v1` or AI-meal JSON cannot be used as a full backup.
+
+From v1.36.0 backups include the `food_synonyms` table. Earlier v1 ZIPs without this table remain restorable, using an empty synonym list (full replacement, not a merge).

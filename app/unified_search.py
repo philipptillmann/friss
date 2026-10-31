@@ -68,7 +68,7 @@ def install(app,db,auth,normalize):
         def add(item):
             key=(item['source'],item['id'])
             if key not in candidates:candidates[key]=item
-        for f in food_search.search(db,normalize,q,lang,15):add({'source':'bls','id':f['bls_code'],'label':f['display_name']})
+        for f in food_search.search(db,normalize,q,lang,15):add({'source':'bls','id':f['bls_code'],'label':f['display_name'],'synonym':f.get('synonym'),'synonym_priority':f.get('synonym_priority',2)})
         for f in own:
             if query in food_search.term(f['name_de']+' '+f.get('name_en',''),normalize):add({'source':'manual','id':f['id'],'label':f.get('name_'+lang) or f['name_de']})
         for r in recipes:
@@ -95,7 +95,7 @@ def install(app,db,auth,normalize):
         preferences.update({(row['source'],row['target']):(row['hits'],row['recent']) for row in learned if row['source']!='bls' or ('bls',row['target']) not in preferences})
         def rank(item):
             hits,recent=preferences.get((item['source'],item['id']),(0,0));name=food_search.term(item['label'],normalize)
-            return (-hits,-recent,name!=query,not name.startswith(query),not item.get('favorite',False),len(name),item['label'],item['source'])
+            return (item.get('synonym_priority',2),-hits,-recent,name!=query,not name.startswith(query),not item.get('favorite',False),len(name),item['label'],item['source'])
         amounts=last_quantities(db)
         for key,item in candidates.items():
             if not item.get('default_quantity') and key in amounts:item['default_quantity']=amounts[key]

@@ -20,7 +20,7 @@ Object.assign(words.en,{unifiedSearch:'Search foods and recipes',unifiedLoading:
   shown=results;highlight=-1;$('results').replaceChildren();
   for(const result of results){const button=document.createElement('button');button.type='button';button.className='result';button.setAttribute('role','option');button.setAttribute('aria-selected','false');
    const source=sourceBadge(result.source,result.category);
-   const name=document.createElement('span');name.className='searchResultName';name.textContent=result.label+[result.brand,result.package_quantity].filter(Boolean).map(s=>' · '+s).join('');button.append(source,name);
+   const name=document.createElement('span');name.className='searchResultName';name.textContent=result.label+[result.brand,result.package_quantity,result.synonym?t('synonymMatch')+': '+result.synonym:null].filter(Boolean).map(s=>' · '+s).join('');button.append(source,name);
    if(result.favorite){const star=document.createElement('span');star.className='searchFavorite';star.textContent='★';star.setAttribute('aria-label',t('searchFav'));button.append(star);}
    button.onclick=()=>choose(result,query,language);$('results').append(button);
   }

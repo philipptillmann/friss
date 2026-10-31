@@ -466,3 +466,7 @@ Die Eintragsdetails verwenden dieselbe Reihenfolge wie Home: Kalorien, Protein, 
 ### Chefkoch-Rezeptimport (v1.35.0)
 
 Unter **Rezepte → Rezept von Chefkoch importieren** einen Rezeptlink einfügen, laden und Titel, Portionen, Zutaten und Zubereitung bearbeiten. Bekannte Gramm-/Millilitermengen werden übernommen, Stück und EL/TL bleiben als Originalangabe erhalten. BLS-Zutaten können vor dem Speichern gewählt oder anschließend nachbearbeitet werden. **Als neues Rezept speichern** erstellt ein normales, weiter bearbeitbares Rezept mit dauerhaftem Quellenlink. [Anleitung](docs/RECIPE_IMPORT.md).
+
+### BLS-Synonyme und Suchvorschläge (v1.36.0)
+
+Unter **Einstellungen → Suchbegriffe und BLS-Synonyme** eigene Suchbegriffe mit BLS-Lebensmitteln verknüpfen, bearbeiten und löschen. Diese Vorschläge stehen vor der automatischen Sortierung und funktionieren auch ohne Namensübereinstimmung. Gelernte Suchzuordnungen lassen sich dort ebenfalls anzeigen, vergessen oder als eigenes Synonym neu zuordnen. Deutsch/Englisch und ZIP-Sicherungen werden unterstützt. [Anleitung](docs/SEARCH_PREFERENCES.md).

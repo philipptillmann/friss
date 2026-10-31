@@ -50,6 +50,7 @@ async def lifespan(app):
         CREATE TABLE IF NOT EXISTS login_attempts(client TEXT PRIMARY KEY, failures INTEGER NOT NULL, window REAL NOT NULL);
         CREATE TABLE IF NOT EXISTS foods(code TEXT PRIMARY KEY, payload TEXT NOT NULL, search TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS search_selections(id TEXT PRIMARY KEY, query TEXT NOT NULL, lang TEXT NOT NULL, source TEXT NOT NULL, target TEXT NOT NULL, payload TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS food_synonyms(id TEXT PRIMARY KEY, query TEXT NOT NULL, label TEXT NOT NULL, lang TEXT NOT NULL, code TEXT NOT NULL, version INTEGER NOT NULL, UNIQUE(query,lang,code));
         CREATE TABLE IF NOT EXISTS food_search_selections(id TEXT PRIMARY KEY, query TEXT NOT NULL, lang TEXT NOT NULL, code TEXT NOT NULL);
         CREATE INDEX IF NOT EXISTS food_search_query ON food_search_selections(query,lang,code);
         CREATE TABLE IF NOT EXISTS preferences(id INTEGER PRIMARY KEY, payload TEXT NOT NULL);
@@ -78,7 +79,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.35.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.36.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -863,3 +864,6 @@ entry_photos.install(app,db,auth,load_entry,lambda:DATA)
 
 from . import recipe_import
 recipe_import.install(app,db,auth,Entry,process,recipe_details,lambda:DATA,normalize)
+
+from . import search_preferences
+search_preferences.install(app,db,auth,normalize)
