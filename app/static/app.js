@@ -102,7 +102,7 @@ function renderRecipes(){
  $('recipeEditorTitle').setAttribute('data-i',recipeCategory()==='drink'?'drinkRecipes':'recipes');$('recipeEditorTitle').textContent=t(recipeCategory()==='drink'?'drinkRecipes':'recipes');
  $('recipeAmend').hidden=!activeRecipe;$('migrateRecipe').hidden=!activeRecipe;$('migrateRecipe').textContent=t(recipeCategory()==='drink'?'migrateFood':'migrateDrink');$('drinkDefinitionFields').hidden=recipeCategory()!=='drink';$('logDefinedDrink').hidden=recipeCategory()!=='drink'||!activeRecipe;
  $('duplicateRecipe').disabled=!activeRecipe||recipeDuplicateBusy;
- const r=recipeRows.find(r=>r.id===activeRecipe);$('recipeInfo').textContent=r?`${t('ingredients')}: ${r.ingredients.length} · ${t(r.status)} · ${formatNumber(r.servings)} ${t('portions')}`:'';
+ const r=recipeRows.find(r=>r.id===activeRecipe);$('recipeSourceLink').hidden=!r?.import_source?.url;if(r?.import_source?.url){$('recipeSourceLink').href=r.import_source.url;$('recipeSourceLink').textContent='Chefkoch';}$('recipeInfo').textContent=r?`${t('ingredients')}: ${r.ingredients.length} · ${t(r.status)} · ${formatNumber(r.servings)} ${t('portions')}`:'';
  if(recipePage()){$('entryPanel').hidden=!r;$('entriesPanel').hidden=!r;}
  if(typeof renderQuickRecipeChoices==='function')renderQuickRecipeChoices();
  updatePageLabels();

@@ -462,3 +462,7 @@ Nach `POST /json-import` den zurückgegebenen `entry_id` verwenden und jedes Mod
 Die Mahlzeitenliste zeigt die Datenquelle mit denselben farbigen Tags wie die Suche: BLS, Open Food Facts, eigene Zutaten, Rezepte oder Getränke. Importierte KI-Nährwerte erhalten „KI-Import“, noch nicht zugeordnete Eingaben einen neutralen Tag. Ein Rezepteintrag bleibt als Rezept/Getränk erkennbar, auch wenn seine Zutaten aus BLS stammen. Favoriten behalten den Tag ihrer eigentlichen Nährwertquelle.
 
 Die Eintragsdetails verwenden dieselbe Reihenfolge wie Home: Kalorien, Protein, Kohlenhydrate, Fett, gesättigte Fettsäuren, Zucker, Ballaststoffe, Cholesterin; zusätzlich erfasstes Trinkwasser; Koffein und Alkohol; danach die übrigen vorhandenen Nährstoffe in der Reihenfolge der Home-Mikronährstoffe. Werte, Einheiten und Berechnungen bleiben unverändert.
+
+### Chefkoch-Rezeptimport (v1.35.0)
+
+Unter **Rezepte → Rezept von Chefkoch importieren** einen Rezeptlink einfügen, laden und Titel, Portionen, Zutaten und Zubereitung bearbeiten. Bekannte Gramm-/Millilitermengen werden übernommen, Stück und EL/TL bleiben als Originalangabe erhalten. BLS-Zutaten können vor dem Speichern gewählt oder anschließend nachbearbeitet werden. **Als neues Rezept speichern** erstellt ein normales, weiter bearbeitbares Rezept mit dauerhaftem Quellenlink. [Anleitung](docs/RECIPE_IMPORT.md).

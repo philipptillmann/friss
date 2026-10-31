@@ -78,7 +78,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.34.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.35.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -102,7 +102,7 @@ class Entry(BaseModel):
     manual_id: UUID | None = None
     bls_code: str | None = None
     filename: str | None = None
-    capture_method: Literal['recent','favorite','json_import'] | None = None
+    capture_method: Literal['recent','favorite','json_import','recipe_import'] | None = None
     recipe_id: UUID | None = None
     drink: Literal['water','coffee','alcohol'] | None = None
     caffeine_mg: float | None = Field(default=None, ge=0, allow_inf_nan=False)
@@ -743,7 +743,7 @@ async def edit_recipe(id: UUID, body: RecipeEdit):
         row=c.execute('SELECT payload FROM recipes WHERE id=?',(str(id),)).fetchone()
         if not row:raise HTTPException(404,'Recipe not found')
         previous=json.loads(row['payload'])
-        r={**{k:previous[k] for k in ('copied_from','duplicate_request') if k in previous},'id':str(id),**body.model_dump(mode='json',exclude={'amend_existing'})}
+        r={**{k:previous[k] for k in ('copied_from','duplicate_request','import_source','import_request_fingerprint') if k in previous},'id':str(id),**body.model_dump(mode='json',exclude={'amend_existing'})}
         updated=[]
         if body.amend_existing:
             details=recipe_details(r)
@@ -860,3 +860,6 @@ from . import backups
 backups.install(app,db,auth,lambda:DATA)
 
 entry_photos.install(app,db,auth,load_entry,lambda:DATA)
+
+from . import recipe_import
+recipe_import.install(app,db,auth,Entry,process,recipe_details,lambda:DATA,normalize)

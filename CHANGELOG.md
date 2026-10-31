@@ -1,3 +1,10 @@
+## 1.35.0 — Chefkoch-Rezeptimport
+
+- #79: Chefkoch-Link auf der Rezeptseite laden, Titel/Portionen/Zutaten/Zubereitung vor dem Speichern bearbeiten und als neues Rezept übernehmen.
+- Original-Zutatenangaben und Quellenlink erhalten; bekannte Gewichts-/Volumenmengen normalisieren, Stück-/Löffelmengen unbekannt lassen. Optionale BLS-Auswahl ohne automatische Fehlzuordnung.
+- Gemeinsames Speichern von Rezept und Zutaten mit wiederholbarer Import-ID; anschließende Bearbeitung, Duplizieren, Migration und ZIP-Backup unterstützen die Herkunftsdaten.
+- Rezeptimporte erscheinen nicht im Tagebuch oder Health; offene Zutaten vor dem Verzehr nachbearbeiten. Netzwerkzugriff auf Chefkoch begrenzen und Weiterleitungen prüfen.
+
 ## 1.34.0 — Nährwertreihenfolge und Quellen-Tags
 
 - #78: Eintragsdetails verwenden dieselbe Reihenfolge wie Home: Kalorien und Makronährstoffe, zusätzlich erfasstes Trinkwasser, Koffein/Alkohol, danach weitere Nährstoffe.
