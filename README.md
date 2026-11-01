@@ -476,3 +476,5 @@ Unter **Einstellungen → Suchbegriffe und BLS-Synonyme** eigene Suchbegriffe mi
 Der Import unter **Manuell** unterstützt auch `https://fddb.mobi/de/…html` neben den bisherigen FDDB-Links. Die deklarierte Basis **100 g oder 100 ml** wird übernommen und ist im Editor sichtbar. Getränke pro 100 ml werden anschließend mit ml-Mengen verwendet, ohne g/ml gleichzusetzen. Beispiel des Bitburger-Links: 33 kcal/100 ml ergeben 165 kcal für 500 ml. [Details](docs/FDDB_IMPORT.md).
 
 Ab v1.37.1 gibt es unter **Manuell** neben **Nährwertetikett fotografieren** auch **Etikettbild hochladen** für vorhandene Bilder aus Fotos/Dateien. Beide Wege führen zur gleichen OCR-Vorschau; Werte vor dem Speichern prüfen.
+
+Ab v1.38.0 zeigt Friss unter **Natrium** die nicht editierbare **Salzmenge (berechnet)**: Natrium in mg × 2,5 ÷ 1.000 ergibt Salz in g. Im Zutateneditor aktualisiert sich der Hinweis beim Ändern des Werts oder der Einheit. Home und Eintragsdetails zeigen dieselbe Umrechnung; unbekanntes Natrium ergibt keine erfundene Salzmenge. Salz wird nicht zusätzlich gespeichert oder exportiert.

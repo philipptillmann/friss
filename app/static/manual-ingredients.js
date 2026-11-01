@@ -33,6 +33,7 @@ function updateManualCaptureInfo(){
 function restoreManualSelection(entry){
  manualRestoredEntry=entry;renderManualChoices();$('manualCaptureSelect').value=entry.manual_id;updateManualCaptureInfo();
 }
+function updateManualSaltHint(){const hint=$('manualSaltHint');if(!hint||typeof saltHintText!=='function')return;const input=$('manualValue-dietarySodium'),unit=$('manualUnit-dietarySodium');hint.textContent=saltHintText(input&&input.value!==''?[{value:Number(input.value),unit:unit.value}]:[]);}
 function buildManualFields(){
  if(manualFieldsReady)return;
  $('manualNutrientFields').replaceChildren();
@@ -46,9 +47,9 @@ function buildManualFields(){
  const input=document.createElement('input');input.id=label.htmlFor;input.type='number';input.min='0';input.step='any';
  const unit=document.createElement('select');unit.id='manualUnit-'+field.key;unit.setAttribute('aria-label',nutrientLabel(field.key)+' · unit');
  for(const name of field.units){const option=document.createElement('option');option.value=name;option.textContent=name==='mcg'?'µg':name;unit.append(option);}unit.value=field.unit;
- row.append(label,input,unit);$('manualNutrientFields').append(row);
+ row.append(label,input,unit);if(field.key==='dietarySodium'){const hint=document.createElement('p');hint.id='manualSaltHint';hint.className='note saltHint';hint.setAttribute('aria-live','polite');row.append(hint);input.oninput=updateManualSaltHint;unit.onchange=updateManualSaltHint;}$('manualNutrientFields').append(row);
  }
- manualFieldsReady=true;
+ manualFieldsReady=true;updateManualSaltHint();
 }
 function renderManualList(){
  $('manualList').replaceChildren();const query=$('manualFilter').value.trim().toLocaleLowerCase();
@@ -76,7 +77,7 @@ function editManual(item=null){
  manualEditing=item;manualDraft=null;$('manualForm').reset();$('manualBasis').value=item?.basis_unit||(item?.source?.basis_ml?'ml':'g');updateManualBasisUI();$('manualEditorTitle').textContent=t(item?'editManual':'newManual');
  $('manualNameDe').value=item?.name_de||'';$('manualNameEn').value=item?.name_en||'';$('manualNotes').value=item?.notes||'';$('manualEthanol').value=item?.ethanol_g_per100??'';
  for(const field of manualSchema){$('manualValue-'+field.key).value=item?.nutrients[field.key]?.value??'';$('manualUnit-'+field.key).value=item?.nutrients[field.key]?.unit||field.unit;}
- $('manualNameDe').focus();
+ updateManualSaltHint();$('manualNameDe').focus();
 }
 $('manualForm').onsubmit=async event=>{
  event.preventDefault();if(!manualFieldsReady)return;const button=$('manualSave');button.disabled=true;
@@ -100,7 +101,7 @@ $('manualSave').disabled=true;$('manualImportButton').disabled=true;
 window.addEventListener('friss-data-updated',()=>{if(!$('dashboard').hidden)loadManualIngredients();});
 window.addEventListener('friss-page',()=>{if(!$('dashboard').hidden)loadManualIngredients();});
 window.addEventListener('friss-logout',()=>{manualGeneration++;manualImportGeneration++;manualSource=null;manualImportPending=false;$('manualImportForm').reset();$('manualImportStatus').textContent='';$('manualImportButton').disabled=true;manualItems=[];manualSchema=[];manualEditing=null;manualDraft=null;manualRestoredEntry=null;manualFieldsReady=false;$('manualForm').reset();$('manualNutrientFields').replaceChildren();$('manualFilter').value='';renderManualList();renderManualChoices();$('manualSave').disabled=true;});
-new MutationObserver(()=>{updateManualBasisUI();renderManualList();renderManualChoices();for(const label of document.querySelectorAll('[data-manual-nutrient]'))label.textContent=nutrientLabel(label.dataset.manualNutrient);$('manualEditorTitle').textContent=t(manualEditing?'editManual':'newManual');}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+new MutationObserver(()=>{updateManualSaltHint();updateManualBasisUI();renderManualList();renderManualChoices();for(const label of document.querySelectorAll('[data-manual-nutrient]'))label.textContent=nutrientLabel(label.dataset.manualNutrient);$('manualEditorTitle').textContent=t(manualEditing?'editManual':'newManual');}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 translate();if(!$('dashboard').hidden)loadManualIngredients();
 
 Object.assign(words.de,{manualImportURL:'FoodData- oder FDDB-Link',manualImport:'Nährwerte importieren',manualImportHint:'Link zu fooddata.the50.store/ingredients oder einer deutschen FDDB-Lebensmittelseite einfügen. Import erstellt eine neue Zutat zur Prüfung; gespeichert wird erst mit Speichern. Namen kannst du anschließend anpassen.',manualImportLoading:'Nährwerte werden geladen …',manualImportDone:'Werte mit ihrer Bezugsmenge übernommen. Bitte prüfen und speichern.',manualImportError:'Import fehlgeschlagen.',manualImportReplace:'Die aktuellen Eingaben durch eine neue importierte Zutat ersetzen?',manualImportMissing:'Nicht verfügbare oder nicht unterstützte Nährwerte bleiben leer.',manualImportWater:'Wassergehalt bleibt in Gramm; keine Umrechnung in getrunkenes Wasser.',manualImportCarbs:'Kohlenhydrate auf die europäische Angabe ohne Ballaststoffe umgerechnet: US-Gesamtwert minus Ballaststoffe. Ballaststoffe und Kalorien bleiben unverändert.',manualImportCarbsUnknown:'Kohlenhydrate bleiben leer: Ballaststoffe fehlen oder sind höher als die Gesamtkohlenhydrate.',manualImportSkipped:'Nicht übernommen',manualImportOther:'Weitere Hinweise stehen in den Notizen.',manualImportCancelled:'Import nicht übernommen, weil die Eingaben inzwischen geändert wurden.'});
@@ -125,6 +126,6 @@ $('manualImportForm').onsubmit=async event=>{
 };
 // Editing while a source request is pending cancels applying its result.
 function cancelStaleImport(){if(manualImportPending){manualImportGeneration++;$('manualImportStatus').textContent=t('manualImportCancelled');}}
-$('manualForm').addEventListener('input',cancelStaleImport);
+$('manualForm').addEventListener('input',cancelStaleImport);$('manualForm').addEventListener('reset',()=>setTimeout(updateManualSaltHint,0));
 $('manualImportURL').oninput=cancelStaleImport;
 translate();

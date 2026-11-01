@@ -1,0 +1,16 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const els=new Map();function element(tag){const e={tag,value:'',children:[],dataset:{},append(...n){this.children.push(...n)},replaceChildren(...n){this.children=n},setAttribute(){},addEventListener(){},focus(){},reset(){}};Object.defineProperty(e,'id',{set(v){els.set(v,e)}});return e}const $=id=>{if(!els.has(id))els.set(id,element('div'));return els.get(id)};
+const schema=[{key:'dietarySodium',unit:'mg',units:['g','mg','mcg']}];let saved;
+const ctx=vm.createContext({$,words:{de:{},en:{}},lang:'de',t:k=>ctx.words.de[k]||k,formatHome:n=>new Intl.NumberFormat('de',{maximumFractionDigits:2}).format(n),document:{createElement:element,documentElement:{},querySelectorAll:()=>[]},window:{addEventListener(){}},MutationObserver:class{observe(){}},editing:null,standardKeys:[],nutrientLabel:k=>k,translate(){},message(){},uuid:()=> 'id',api:async(path,opts)=>{if(opts?.method==='POST'){saved=JSON.parse(opts.body);return {}}return path.endsWith('/schema')?schema:[]}});
+const home=fs.readFileSync('app/static/home.js','utf8');vm.runInContext(home.slice(home.indexOf("Object.assign(words.de,{saltDerived"),home.indexOf('function tableRow(')),ctx);
+vm.runInContext(fs.readFileSync('app/static/manual-ingredients.js','utf8'),ctx);
+vm.runInContext('manualSchema='+JSON.stringify(schema)+';buildManualFields()',ctx);
+const input=$('manualValue-dietarySodium'),unit=$('manualUnit-dietarySodium'),hint=$('manualSaltHint');assert.equal(hint.tag,'p');assert.ok(hint.textContent.includes('unbekannt'));
+input.value='400';unit.value='mg';input.oninput();assert.ok(hint.textContent.includes('1 g (400 mg × 2,5 ÷ 1.000)'));
+input.value='.4';unit.value='g';unit.onchange();assert.ok(hint.textContent.includes('1 g (400 mg'));
+input.value='400000';unit.value='mcg';unit.onchange();assert.ok(hint.textContent.includes('1 g (400 mg'));
+input.value='0';input.oninput();assert.ok(hint.textContent.includes('0 g'));
+input.value='';input.oninput();assert.ok(hint.textContent.includes('unbekannt'));
+assert.ok(vm.runInContext("saltHintText([{value:400,unit:'mg'}],true)",ctx).includes('partial'));
+assert.ok(vm.runInContext("saltHintText([{value:400,unit:null}])",ctx).includes('unbekannt'));
+(async()=>{input.value='400';unit.value='mg';$('manualNameDe').value='Test';$('manualBasis').value='g';await $('manualForm').onsubmit({preventDefault(){}});assert.deepEqual(Object.keys(saved.nutrients),['dietarySodium']);assert.equal(saved.nutrients.dietarySodium.value,400);console.log('Salt hint UI: read-only live conversion, g/mg/mcg, zero/unknown/partial and sodium-only save passed')})().catch(e=>{console.error(e);process.exitCode=1});

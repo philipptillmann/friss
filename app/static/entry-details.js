@@ -49,7 +49,7 @@ function renderEntryDetails(setTime=false){
  if(e.ethanol_g!=null)contributions.ethanol_g={value:e.ethanol_g,unit:'g'};
  for(const [key,n] of Object.entries(contributions).sort(([a],[b])=>compareHomeNutrients(a,b))){
  const text=n.value==null?(n.qualifier==null?t('entryUnknown'):String(n.qualifier)):formatHome(n.value)+' '+(n.unit==='mcg'?'µg':n.unit||t('sourceUnits'));
- tableRow($('detailNutrients'),key==='drinking_water_ml'?t('detailWater'):key==='ethanol_g'?t('detailAlcohol'):nutrientLabel(key),text);
+ tableRow($('detailNutrients'),key==='drinking_water_ml'?t('detailWater'):key==='ethanol_g'?t('detailAlcohol'):nutrientLabel(key),text,null,key==='dietarySodium'?saltHintText([n]):null);
  }
  if(!$('detailNutrients').children.length)tableRow($('detailNutrients'),t('entryNutrients'),t('entryUnknown'));
  $('detailWarnings').textContent=[t('detailUnitHint'),e.reason,...(e.warnings||[])].filter(Boolean).join(' ');

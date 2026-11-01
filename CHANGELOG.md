@@ -1,3 +1,8 @@
+## 1.38.0 — Salzmenge unter Natrium anzeigen
+
+- #83: Nicht editierbare Salzmenge mit sichtbarer Natrium-Umrechnung im Zutateneditor, auf Home und in Eintragsdetails anzeigen. Aktualisiert sich bei Natrium-/Einheitenänderungen; fehlende Werte bleiben unbekannt.
+- Salz bleibt eine reine Anzeige und wird nicht zusätzlich gespeichert, summiert oder nach Health exportiert.
+
 ## 1.37.1 — Vorhandenes Nährwertetikett hochladen
 
 - #82: Neben Fotografieren eine eigene Bildauswahl ohne erzwungene Kamera anbieten. Beide Wege verwenden dieselbe OCR-Vorschau, Prüfung und manuelle Speicherung.
