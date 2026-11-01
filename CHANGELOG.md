@@ -1,3 +1,7 @@
+## 1.37.1 — Vorhandenes Nährwertetikett hochladen
+
+- #82: Neben Fotografieren eine eigene Bildauswahl ohne erzwungene Kamera anbieten. Beide Wege verwenden dieselbe OCR-Vorschau, Prüfung und manuelle Speicherung.
+
 ## 1.37.0 — FDDB-Mobile-Links und Nährwerte pro 100 ml
 
 - #81: Neue `fddb.mobi/de/…html`-Produktlinks samt mobiler Nährwertliste und Mineralstofftabellen unterstützen; bisherige `fddb.info`-Links bleiben gültig.

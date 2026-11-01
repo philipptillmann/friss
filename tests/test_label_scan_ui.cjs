@@ -5,9 +5,12 @@ const result={text:'Per 100g\nProtein 4 g',nutrients:{dietaryProtein:{value:4,un
 const context=vm.createContext({$,words:{de:{},en:{}},t:k=>k,translate(){},window:{addEventListener:(n,f)=>listeners[n]=f},manualFieldsReady:true,manualImportPending:false,manualImportGeneration:0,manualEditing:null,manualSource:null,manualDraft:null,manualHasDraft:()=>false,confirm:()=>true,barcodeImage:async file=>file,editManual:value=>{draft=value;context.manualImportGeneration++},api:async(path,opts)=>{requests.push({path,opts});return pending?new Promise(resolve=>pending.resolve=resolve):result}});
 vm.runInContext(fs.readFileSync('app/static/label-scan.js','utf8'),context);
 (async()=>{
+ $('labelScanButton').onclick();assert.equal($('labelScanFile').clicked,true);$('labelUploadButton').onclick();assert.equal($('labelUploadFile').clicked,true);
  $('labelScanFile').files=[{name:'label.jpg'}];await $('labelScanFile').onchange();
  assert.equal(requests[0].path,'/manual-ingredients/scan-label');assert.equal(draft.nutrients.dietaryProtein.value,4);assert.equal(draft.name_de,'');assert.ok(draft.notes.includes(result.text));assert.equal($('labelScanReview').hidden,false);assert.equal(context.manualEditing,null);
- draft=null;pending={};$('labelScanFile').files=[{}];const inflight=$('labelScanFile').onchange();await new Promise(resolve=>setImmediate(resolve));context.manualImportGeneration++;pending.resolve(result);await inflight;assert.equal(draft,null,'stale OCR must not overwrite newer input');
+ const uploaded={name:'uploaded-label.png'};$('labelUploadFile').files=[uploaded];await $('labelUploadFile').onchange();assert.equal(requests[1].opts.body,uploaded);assert.equal($('labelUploadFile').value,'');assert.equal($('labelUploadButton').disabled,false);
+ draft=null;pending={};$('labelScanFile').files=[{}];const inflight=$('labelScanFile').onchange();await new Promise(resolve=>setImmediate(resolve));assert.equal($('labelUploadButton').disabled,true);context.manualImportGeneration++;pending.resolve(result);await inflight;assert.equal(draft,null,'stale OCR must not overwrite newer input');
  listeners['friss-logout']();assert.equal($('labelScanText').textContent,'');assert.equal($('labelScanReview').hidden,true);
- console.log('Label scanner UI: review-only import, stale response and logout passed');
+ const html=fs.readFileSync('app/static/index.html','utf8');assert.ok(html.match(/<input id="labelScanFile"[^>]*capture="environment"/));assert.equal(/<input id="labelUploadFile"[^>]*capture=/.test(html),false);
+ console.log('Label scanner UI: camera and file upload, review-only import, stale response and logout passed');
 })().catch(e=>{console.error(e);process.exitCode=1});

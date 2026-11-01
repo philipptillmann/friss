@@ -474,3 +474,5 @@ Unter **Einstellungen → Suchbegriffe und BLS-Synonyme** eigene Suchbegriffe mi
 ### FDDB-Mobile-Import (v1.37.0)
 
 Der Import unter **Manuell** unterstützt auch `https://fddb.mobi/de/…html` neben den bisherigen FDDB-Links. Die deklarierte Basis **100 g oder 100 ml** wird übernommen und ist im Editor sichtbar. Getränke pro 100 ml werden anschließend mit ml-Mengen verwendet, ohne g/ml gleichzusetzen. Beispiel des Bitburger-Links: 33 kcal/100 ml ergeben 165 kcal für 500 ml. [Details](docs/FDDB_IMPORT.md).
+
+Ab v1.37.1 gibt es unter **Manuell** neben **Nährwertetikett fotografieren** auch **Etikettbild hochladen** für vorhandene Bilder aus Fotos/Dateien. Beide Wege führen zur gleichen OCR-Vorschau; Werte vor dem Speichern prüfen.
