@@ -482,3 +482,7 @@ Ab v1.38.0 zeigt Friss unter **Natrium** die nicht editierbare **Salzmenge (bere
 ### Zukunft oder Vergangenheit korrigieren (v1.39.0)
 
 Beim Bearbeiten gespeicherter manueller Zutaten, Rezepte und Getränke zwischen **Nur für zukünftige Einträge speichern** und **Speichern und bisherige Einträge korrigieren** wählen. Bei manuellen Zutaten umfasst die Korrektur direkte Tagebucheinträge, Rezeptzutaten und bereits gebuchte Rezeptportionen mit dieser Zutat. Mengen und Zeitpunkte bleiben erhalten. Die Zukunftsoption lässt bestehende Momentaufnahmen unverändert. Apple Health muss separat korrigiert werden. [Details und Grenzen](docs/CORRECTING_HISTORY.md).
+
+### Tagesprüfung der Nährwerte (v1.40.0)
+
+Unter **Statistik → Tagesprüfung** einzelne Tage durchblättern und jeden Tagebucheintrag als Zeile mit allen Nährstoffen als Spalten prüfen. Die breite Desktop-Tabelle zeigt Quellen, fehlende/ungeprüfte Werte und Null-Annahmen sowie bekannte Spaltensummen. Eintragsnamen öffnen Details in einem neuen Tab. Der bisherige Statistikbereich bleibt unter **Verlauf**. [Anleitung](docs/DAILY_AUDIT.md).

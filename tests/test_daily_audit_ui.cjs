@@ -1,0 +1,14 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const elements=new Map(),listeners={};function element(tag){return {tag,value:'',textContent:'',hidden:false,children:[],append(...n){this.children.push(...n)},replaceChildren(...n){this.children=n},setAttribute(k,v){this[k]=v}}}const $=id=>{if(!elements.has(id))elements.set(id,element('div'));return elements.get(id)};
+let calls=[],pending=null;
+const fixture={day:'2026-11-01',timezone:'Europe/Berlin',missing_nutrients_as_zero:true,columns:[{key:'dietaryProtein',unit:'g'},{key:'dietaryEnergyConsumed',unit:'kcal'}],rows:[{id:'entry',timestamp:'2026-11-01T12:00:00+01:00',name_de:'Meal',status:'processed',quantity:{value:100,unit:'g'},incomplete:1,cells:{dietaryProtein:{value:null,status:'missing',assumed:true,unit:'g'},dietaryEnergyConsumed:{value:0,status:'known',unit:'kcal'}}}],totals:{dietaryProtein:{value:null,incomplete:1},dietaryEnergyConsumed:{value:0,incomplete:0}}};
+const context=vm.createContext({$,words:{de:{},en:{}},t:k=>k,lang:'de',currentPage:'statistics',document:{createElement:element,documentElement:{classList:{toggle(){},remove(){}}}},window:{addEventListener:(n,f)=>listeners[n]=f},MutationObserver:class{observe(){}},localDate:d=>d.toISOString().slice(0,10),formatHome:String,nutrientLabel:k=>k,compareHomeNutrients:(a,b)=>a==='dietaryEnergyConsumed'?-1:b==='dietaryEnergyConsumed'?1:a.localeCompare(b),entrySourceBadge:()=>element('span'),translate(){},api:async path=>{calls.push(path);return pending?new Promise(resolve=>pending.resolve=resolve):fixture;}});
+vm.runInContext(fs.readFileSync('app/static/daily-audit.js','utf8'),context);
+(async()=>{
+ $('auditDay').value='2026-11-01';$('statsAuditTab').onclick();await new Promise(r=>setImmediate(r));assert.equal($('statsTrendsPanel').hidden,true);assert.equal($('auditBody').children.length,1);assert.equal($('auditBody').children[0].children[6].textContent,'0');assert.equal($('auditBody').children[0].children[7].textContent,'— *');assert.equal($('auditBody').children[0].children[0].children[0].target,'_blank');assert.equal($('auditZeroHint').hidden,false);
+ $('auditPrevious').onclick();await new Promise(r=>setImmediate(r));assert.equal($('auditDay').value,'2026-10-31');assert.ok(calls.at(-1).includes('day=2026-10-31'));
+ $('auditNext').onclick();await new Promise(r=>setImmediate(r));assert.equal($('auditDay').value,'2026-11-01');
+ pending={};$('auditDay').onchange();await new Promise(r=>setImmediate(r));$('statsTrendsTab').onclick();pending.resolve(fixture);await new Promise(r=>setImmediate(r));assert.equal($('auditBody').children.length,0,'late response must not populate an inactive view');
+ listeners['friss-logout']();assert.equal($('auditHead').children.length,0);
+ console.log('Daily audit UI: rows/columns, zero vs missing, assumptions, date arrows, entry links and stale/logout guards passed');
+})().catch(e=>{console.error(e);process.exitCode=1});

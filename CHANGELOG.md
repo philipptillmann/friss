@@ -1,3 +1,10 @@
+## 1.40.0 — Nährwert-Tagesprüfung für den Computer
+
+- #85: Unter Statistik zwischen Verlauf und Tagesprüfung wechseln. Einzelne Tage mit Pfeilen, Datumswahl und Heute-Button durchsuchen.
+- Einträge als Zeilen und sämtliche erfassten Nährwerte als Spalten darstellen; Quellen-Tags, Details-Links, feste Überschriften/Namen und breite Scrolltabelle ergänzen.
+- Bekannte Nullwerte, fehlende Werte, Nachweisgrenzen, ungeprüfte/abweichende Einheiten und Null-Annahmen unterscheiden. Bekannte Summen und Lückenanzahlen pro Spalte anzeigen.
+- Quelldatenlücken unabhängig von der Null-Annahme-Einstellung erhalten; Zeitzone/Sommerzeit und Ausschluss von Rezeptzutaten berücksichtigen. Keine Datenänderungen.
+
 ## 1.39.0 — Manuelle Zutaten rückwirkend korrigieren
 
 - #84: Bei gespeicherten manuellen Zutaten dieselben Optionen wie bei Rezepten/Getränken anbieten: nur zukünftig speichern oder bisherige Verwendungen korrigieren.

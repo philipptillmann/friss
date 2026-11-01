@@ -79,7 +79,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.39.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.40.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -872,3 +872,6 @@ recipe_import.install(app,db,auth,Entry,process,recipe_details,lambda:DATA,norma
 
 from . import search_preferences
 search_preferences.install(app,db,auth,normalize)
+
+from . import daily_audit
+daily_audit.install(app,db,auth)
