@@ -478,3 +478,7 @@ Der Import unter **Manuell** unterstützt auch `https://fddb.mobi/de/…html` ne
 Ab v1.37.1 gibt es unter **Manuell** neben **Nährwertetikett fotografieren** auch **Etikettbild hochladen** für vorhandene Bilder aus Fotos/Dateien. Beide Wege führen zur gleichen OCR-Vorschau; Werte vor dem Speichern prüfen.
 
 Ab v1.38.0 zeigt Friss unter **Natrium** die nicht editierbare **Salzmenge (berechnet)**: Natrium in mg × 2,5 ÷ 1.000 ergibt Salz in g. Im Zutateneditor aktualisiert sich der Hinweis beim Ändern des Werts oder der Einheit. Home und Eintragsdetails zeigen dieselbe Umrechnung; unbekanntes Natrium ergibt keine erfundene Salzmenge. Salz wird nicht zusätzlich gespeichert oder exportiert.
+
+### Zukunft oder Vergangenheit korrigieren (v1.39.0)
+
+Beim Bearbeiten gespeicherter manueller Zutaten, Rezepte und Getränke zwischen **Nur für zukünftige Einträge speichern** und **Speichern und bisherige Einträge korrigieren** wählen. Bei manuellen Zutaten umfasst die Korrektur direkte Tagebucheinträge, Rezeptzutaten und bereits gebuchte Rezeptportionen mit dieser Zutat. Mengen und Zeitpunkte bleiben erhalten. Die Zukunftsoption lässt bestehende Momentaufnahmen unverändert. Apple Health muss separat korrigiert werden. [Details und Grenzen](docs/CORRECTING_HISTORY.md).

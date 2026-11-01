@@ -1,0 +1,13 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const els=new Map();function element(){const e={value:'',hidden:false,disabled:false,children:[],dataset:{},append(...n){this.children.push(...n)},replaceChildren(...n){this.children=n},setAttribute(){},addEventListener(){},focus(){},reset(){}};Object.defineProperty(e,'id',{set(v){this._id=v;els.set(v,e)},get(){return this._id}});return e}const $=id=>{if(!els.has(id)){const e=element();e.id=id}return els.get(id)};
+let calls=[],allow=false,refreshes=0;
+const food={id:'food',version:0,name_de:'Milk',name_en:'Milk',nutrients:{dietaryEnergyConsumed:{value:60,unit:'kcal'}}},schema=[{key:'dietaryEnergyConsumed',unit:'kcal',units:['kcal']}];
+const ctx=vm.createContext({$,words:{de:{},en:{}},lang:'de',t:k=>k,editing:null,standardKeys:[],nutrientLabel:k=>k,formatHome:String,document:{createElement:element,documentElement:{},querySelectorAll:()=>[]},window:{addEventListener(){}},MutationObserver:class{observe(){}},translate(){},message(){},uuid:()=> 'new',confirm:()=>allow,refresh:async()=>{refreshes++},api:async(path,opts)=>{if(opts){calls.push({path,body:JSON.parse(opts.body)});return {amended_entries:3}}return path.endsWith('/schema')?schema:[food]}});
+vm.runInContext(fs.readFileSync('app/static/manual-ingredients.js','utf8'),ctx);
+(async()=>{await vm.runInContext('loadManualIngredients()',ctx);ctx.food=food;vm.runInContext('editManual(food)',ctx);assert.equal($('manualAmend').hidden,false);assert.equal($('manualSave').textContent,'saveFuture');
+ await $('manualForm').onsubmit({preventDefault(){},submitter:$('manualSave')});assert.equal(calls[0].body.amend_existing,false);assert.equal(refreshes,0);
+ vm.runInContext('editManual(food)',ctx);await $('manualForm').onsubmit({preventDefault(){},submitter:$('manualAmend')});assert.equal(calls.length,1,'cancel confirmation must not save');allow=true;await $('manualForm').onsubmit({preventDefault(){},submitter:$('manualAmend')});assert.equal(calls[1].body.amend_existing,true);assert.equal(refreshes,1);
+ vm.runInContext('editManual()',ctx);assert.equal($('manualAmend').hidden,true);assert.equal($('manualSave').textContent,'save');
+ const html=fs.readFileSync('app/static/index.html','utf8');assert.ok(html.includes('id="recipeAmend"'));assert.ok(html.includes('id="manualAmend"'));
+ console.log('Manual correction UI: future/past buttons, confirmation cancellation, request flags and refresh passed');
+})().catch(e=>{console.error(e);process.exitCode=1});

@@ -61,6 +61,9 @@ class ManualEdit(BaseModel):
             if n.unit not in allowed:raise ValueError('Invalid nutrient unit')
         return self
 
+class ManualCorrection(ManualEdit):
+    amend_existing:bool=False
+
 class Manual(ManualEdit):
     id:UUID
 
@@ -69,7 +72,7 @@ def load(db,id):
     if not row:raise HTTPException(404,'Manual ingredient not found')
     return json.loads(row['payload'])
 
-def install(app,db,auth):
+def install(app,db,auth,amend=None):
     @app.get('/manual-ingredients/schema',dependencies=[Depends(auth)])
     async def schema():
         macros={'dietaryProtein','dietaryCarbohydrates','dietaryFiber','dietarySugar','dietaryFatTotal','dietaryFatSaturated','dietaryFatMonounsaturated','dietaryFatPolyunsaturated'}
@@ -93,16 +96,20 @@ def install(app,db,auth):
             c.execute('INSERT INTO manual_ingredients VALUES(?,?)',(value['id'],json.dumps(value)))
         return value
     @app.put('/manual-ingredients/{id}',dependencies=[Depends(auth)])
-    async def edit(id:UUID,body:ManualEdit):
-        value=body.model_dump(mode='json')
+    async def edit(id:UUID,body:ManualCorrection):
+        value=body.model_dump(mode='json',exclude={'amend_existing'})
+        counts={'amended_entries':0,'amended_direct_entries':0,'amended_recipe_entries':0}
         with db() as c:
             c.execute('BEGIN IMMEDIATE')
             row=c.execute('SELECT payload FROM manual_ingredients WHERE id=?',(str(id),)).fetchone()
             if not row:raise HTTPException(404,'Manual ingredient not found')
             if json.loads(row['payload'])['version']!=body.version:raise HTTPException(409,'Ingredient changed; reload first')
             value.update(id=str(id),version=body.version+1,updated_at=datetime.now(timezone.utc).isoformat())
+            if body.amend_existing:
+                if amend is None:raise HTTPException(503,'Retrospective correction unavailable')
+                counts=await amend(c,value)
             c.execute('UPDATE manual_ingredients SET payload=? WHERE id=?',(json.dumps(value),str(id)))
-        return value
+        return {**value,**counts}
     @app.delete('/manual-ingredients/{id}',dependencies=[Depends(auth)])
     async def remove(id:UUID,version:int):
         with db() as c:

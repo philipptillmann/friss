@@ -79,7 +79,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.38.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.39.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -629,10 +629,11 @@ def load_recipe(id):
     if not row: raise HTTPException(404, 'Recipe not found')
     return json.loads(row['payload'])
 
-def recipe_details(recipe):
-    with db() as c:
-        ingredients=[json.loads(r['payload']) for r in c.execute('SELECT payload FROM entries')]
-    ingredients=[e for e in ingredients if e.get('recipe_id')==recipe['id']]
+def recipe_details(recipe,ingredients=None):
+    if ingredients is None:
+        with db() as c:
+            ingredients=[json.loads(r['payload']) for r in c.execute('SELECT payload FROM entries')]
+        ingredients=[e for e in ingredients if e.get('recipe_id')==recipe['id']]
     additions=recipe.get('alcohol_abv') is not None or any(recipe.get(k,0)>0 for k in ['added_water_ml','added_caffeine_mg','added_ethanol_g'])
     missing_as_zero=nutrient_policy.enabled(db)
     ready=(bool(ingredients) or additions) and all(nutrient_policy.ready(e) if missing_as_zero else e['status']=='processed' for e in ingredients)
@@ -752,6 +753,7 @@ async def edit_recipe(id: UUID, body: RecipeEdit):
             entries=[json.loads(row['payload']) for row in c.execute('SELECT payload FROM entries')]
             for old in entries:
                 if old.get('recipe_id') or old.get('type')!='recipe' or old.get('source',{}).get('recipe_id')!=str(id):continue
+                if old['health_status']=='claimed':raise HTTPException(409,'Health export in progress; finish it before correcting entries')
                 q=old['quantity']
                 replacement=recipe_entry(details,RecipeIntake(id=old['id'],timestamp=old['timestamp'],finished_at=old.get('finished_at'),amount=q['value'],unit=q['unit']))
                 changes={k:replacement.get(k) for k in ('description','source','recipe_snapshot','nutrients','warnings','reason','status','drinking_water_ml','ethanol_g')}
@@ -836,7 +838,10 @@ from . import food_search
 food_search.install(app, db, auth, normalize)
 
 from . import manual_ingredients
-manual_ingredients.install(app,db,auth)
+from . import manual_amend
+async def amend_manual(c,value):
+    return await manual_amend.amend(c,value,process,recipe_details,recipe_entry,RecipeIntake,DATA)
+manual_ingredients.install(app,db,auth,amend_manual)
 
 from . import alcohol
 alcohol.install(app,db,auth)

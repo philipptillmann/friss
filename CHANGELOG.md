@@ -1,3 +1,9 @@
+## 1.39.0 — Manuelle Zutaten rückwirkend korrigieren
+
+- #84: Bei gespeicherten manuellen Zutaten dieselben Optionen wie bei Rezepten/Getränken anbieten: nur zukünftig speichern oder bisherige Verwendungen korrigieren.
+- Direkte Einträge, Rezeptzutaten und betroffene alte Rezeptportionen gemeinsam aktualisieren. Alte Rezeptmomentaufnahmen behalten andere Zutaten und ihre damaligen Rezeptparameter.
+- Mengen, Zeiten, Trinkdauer, Originale und Health-Exportpakete erhalten; frühere Revisionen archivieren. Einheitenkonflikte und laufende Exporte verhindern die gesamte Korrektur.
+
 ## 1.38.0 — Salzmenge unter Natrium anzeigen
 
 - #83: Nicht editierbare Salzmenge mit sichtbarer Natrium-Umrechnung im Zutateneditor, auf Home und in Eintragsdetails anzeigen. Aktualisiert sich bei Natrium-/Einheitenänderungen; fehlende Werte bleiben unbekannt.
