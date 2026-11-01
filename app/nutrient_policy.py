@@ -20,7 +20,8 @@ def ready(e):
     if e.get('status')=='processed':return True
     # Nutrient data may be absent even though identity and amount were resolved.
     q=e.get('quantity') or {}
-    return e.get('status')=='needs_review' and q.get('unit')=='g' and q.get('value',0)>0 and bool(e.get('food')) and e.get('source',{}).get('provider') in ('BLS','Manual','Open Food Facts')
+    expected=(e.get('manual_snapshot') or {}).get('basis_unit','g') if e.get('source',{}).get('provider')=='Manual' else 'g'
+    return e.get('status')=='needs_review' and q.get('unit')==expected and q.get('value',0)>0 and bool(e.get('food')) and e.get('source',{}).get('provider') in ('BLS','Manual','Open Food Facts')
 
 def assumable_qualifier(value):
     if value is None:return True

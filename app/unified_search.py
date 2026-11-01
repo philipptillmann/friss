@@ -25,7 +25,7 @@ def last_quantities(db):
     result={}
     for row in rows:
         e=json.loads(row['payload']);key=identity(e);q=e.get('quantity')
-        if key and key[1] and key not in result and q and q.get('unit')=='g' and isinstance(q.get('value'),(int,float)) and q['value']>0:
+        if key and key[1] and key not in result and q and (q.get('unit')=='g' or key[0]=='manual' and q.get('unit')=='ml') and isinstance(q.get('value'),(int,float)) and q['value']>0:
             result[key]=q
     return result
 
@@ -70,7 +70,7 @@ def install(app,db,auth,normalize):
             if key not in candidates:candidates[key]=item
         for f in food_search.search(db,normalize,q,lang,15):add({'source':'bls','id':f['bls_code'],'label':f['display_name'],'synonym':f.get('synonym'),'synonym_priority':f.get('synonym_priority',2)})
         for f in own:
-            if query in food_search.term(f['name_de']+' '+f.get('name_en',''),normalize):add({'source':'manual','id':f['id'],'label':f.get('name_'+lang) or f['name_de']})
+            if query in food_search.term(f['name_de']+' '+f.get('name_en',''),normalize):add({'source':'manual','id':f['id'],'label':f.get('name_'+lang) or f['name_de'],'basis_unit':f.get('basis_unit','g')})
         for r in recipes:
             if query in food_search.term(r['name'],normalize):add({'source':'recipe','id':r['id'],'label':r['name'],'category':r.get('category','food')})
         # Keep previously chosen OFF products available immediately / offline.

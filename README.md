@@ -470,3 +470,7 @@ Unter **Rezepte → Rezept von Chefkoch importieren** einen Rezeptlink einfügen
 ### BLS-Synonyme und Suchvorschläge (v1.36.0)
 
 Unter **Einstellungen → Suchbegriffe und BLS-Synonyme** eigene Suchbegriffe mit BLS-Lebensmitteln verknüpfen, bearbeiten und löschen. Diese Vorschläge stehen vor der automatischen Sortierung und funktionieren auch ohne Namensübereinstimmung. Gelernte Suchzuordnungen lassen sich dort ebenfalls anzeigen, vergessen oder als eigenes Synonym neu zuordnen. Deutsch/Englisch und ZIP-Sicherungen werden unterstützt. [Anleitung](docs/SEARCH_PREFERENCES.md).
+
+### FDDB-Mobile-Import (v1.37.0)
+
+Der Import unter **Manuell** unterstützt auch `https://fddb.mobi/de/…html` neben den bisherigen FDDB-Links. Die deklarierte Basis **100 g oder 100 ml** wird übernommen und ist im Editor sichtbar. Getränke pro 100 ml werden anschließend mit ml-Mengen verwendet, ohne g/ml gleichzusetzen. Beispiel des Bitburger-Links: 33 kcal/100 ml ergeben 165 kcal für 500 ml. [Details](docs/FDDB_IMPORT.md).

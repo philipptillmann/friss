@@ -3,7 +3,7 @@ import math
 import re
 from datetime import datetime,timezone
 from html.parser import HTMLParser
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit,urljoin
 import httpx
 from fastapi import HTTPException
 from . import fooddata_import as common
@@ -13,6 +13,7 @@ NAMES={
  'protein':('Protein','g'),'eiweiß':('Protein','g'),'kohlenhydrate':('Carbohydrates','g'),
  'davon zucker':('Sugar','g'),'zucker':('Sugar','g'),'fett':('FatTotal','g'),
  'ballaststoffe':('Fiber','g'),'cholesterin':('Cholesterol','mg'),'koffein':('Caffeine','mg'),
+ 'chlor':('Chloride','mg'),'salz':('salt','g'),
  'wassergehalt':('Water','g'),'alkohol':('ethanol','g'),
  'gesättigte fettsäuren':('FatSaturated','g'),'davon gesättigte fettsäuren':('FatSaturated','g'),
  'einfach ungesättigte fettsäuren':('FatMonounsaturated','g'),
@@ -33,15 +34,16 @@ NAMES={
 def canonical_url(value):
     try:
         u=urlsplit(value.strip())
-        if u.scheme!='https' or u.hostname not in ('fddb.info','www.fddb.info') or u.username or u.password or u.port not in (None,443):raise ValueError()
-        if not re.fullmatch(r'/db/de/lebensmittel/[a-z0-9_\-]{1,250}/index\.html',u.path):raise ValueError()
-    except ValueError:raise HTTPException(422,'Use an FDDB food link: https://fddb.info/db/de/lebensmittel/…/index.html')
-    return 'https://fddb.info'+u.path+'?nomobile=1'
+        if u.scheme!='https' or u.hostname not in ('fddb.info','www.fddb.info','fddb.mobi','www.fddb.mobi') or u.username or u.password or u.port not in (None,443):raise ValueError()
+        mobile=u.hostname.endswith('fddb.mobi')
+        if not re.fullmatch(r'/de/[a-z0-9_\-]{1,250}\.html' if mobile else r'/db/de/lebensmittel/[a-z0-9_\-]{1,250}/index\.html',u.path):raise ValueError()
+    except ValueError:raise HTTPException(422,'Use a German FDDB food link: https://fddb.mobi/de/….html or https://fddb.info/db/de/lebensmittel/…/index.html')
+    return ('https://fddb.mobi'+u.path) if mobile else 'https://fddb.info'+u.path+'?nomobile=1'
 
 class Page(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.stack=[];self.rows=[];self.title='';self.active=False;self.basis=False
+        self.stack=[];self.rows=[];self.title='';self.active=False;self.basis=False;self.basis_unit='g'
     def handle_starttag(self,tag,attrs):
         if tag not in ('meta','link','img','br','hr','input','source','area','wbr'):
             self.stack.append({'tag':tag,'attrs':dict(attrs),'text':'','children':[]})
@@ -56,14 +58,18 @@ class Page(HTMLParser):
                 self.stack[-1]['children'].append(node)
             if node['tag']!=tag:continue
             text=' '.join(node['text'].split())
-            if tag=='h1' and node['attrs'].get('id')=='fddb-headline1':self.title=text
+            if tag=='h1' and (node['attrs'].get('id')=='fddb-headline1' or 'fddb-m-hero__title' in node['attrs'].get('class','').split()):self.title=text
             if tag=='h2':
-                if re.fullmatch(r'Nährwerte für\s+100\s*g',text,re.I):self.basis=True;self.active=True
+                if re.fullmatch(r'Nährwerte für\s+100\s*(g|ml)',text,re.I):self.basis=True;self.active=True;self.basis_unit='ml' if text.lower().endswith('ml') else 'g'
                 elif text in ('Vitamine','Mineralstoffe'):self.active=self.basis
                 else:self.active=False
             if tag=='div' and self.active:
                 children=node['children']
                 if len(children)==2 and 'sidrow' in children[0]['attrs'].get('class','').split() and children[1]['tag']=='div':
+                    self.rows.append((' '.join(children[0]['text'].split()),' '.join(children[1]['text'].split())))
+            if self.active and tag in ('li','tr'):
+                children=node['children']
+                if len(children)==2 and ((tag=='li' and 'fddb-m-nutrition__label' in children[0]['attrs'].get('class','').split() and 'fddb-m-nutrition__value' in children[1]['attrs'].get('class','').split()) or (tag=='tr' and all(c['tag']=='td' for c in children))):
                     self.rows.append((' '.join(children[0]['text'].split()),' '.join(children[1]['text'].split())))
             break
 
@@ -74,10 +80,10 @@ def number(text):
 def parse(html,url):
     page=Page();page.feed(html)
     if not page.basis or not page.title or len(page.title)>200 or not page.rows or len(page.rows)>1000:
-        raise HTTPException(422,'No supported FDDB per-100-g nutrient data found')
+        raise HTTPException(422,'No supported FDDB per-100-g/ml nutrient data found')
     nutrients={};original=[];skipped=[];ethanol=None
     # The site rounds kcal and kJ independently: use published kcal first.
-    rows=sorted(page.rows,key=lambda r:common.normalized(r[0])=='brennwert')
+    rows=sorted(page.rows,key=lambda r:(common.normalized(r[0])=='brennwert',common.normalized(r[0])=='salz'))
     for name,text in rows:
         match=re.fullmatch(r'([\d.,]+)\s*([a-zA-Zµμ%]+)',text)
         original.append({'name':name,'value':match[1] if match else text,'unit':match[2] if match else ''})
@@ -88,9 +94,10 @@ def parse(html,url):
             if not match:raise ValueError()
             value=number(match[1]);unit=common.unit_name(match[2])
             if key=='Water' and match[2]=='%':
-                if value>100:raise ValueError()
+                if value>100 or page.basis_unit!='g':raise ValueError()
                 unit='g' # percent water by mass: x grams per 100 g
             value=common.convert(value,unit,target,key)
+            if key=='salt':key='Sodium';target='mg';value*=400
             if not math.isfinite(value) or key=='ethanol' and value>100:raise ValueError()
         except (ValueError,TypeError,OverflowError):
             skipped.append({'name':name,'reason':'unknown_value_or_unit'});continue
@@ -99,26 +106,33 @@ def parse(html,url):
             ethanol=value;continue
         identifier='dietary'+key
         if identifier in nutrients:
-            if common.normalized(name)=='brennwert':continue
+            if common.normalized(name) in ('brennwert','salz'):continue
             if not math.isclose(nutrients[identifier]['value'],value,rel_tol=1e-6,abs_tol=1e-8):raise HTTPException(422,'Conflicting FDDB nutrient values: '+name)
         nutrients[identifier]={'value':value,'unit':target}
     if not nutrients and ethanol is None:raise HTTPException(422,'No supported FDDB nutrients with known units found')
-    warnings=['FDDB values are imported as published per 100 g. Carbohydrates are not reduced by fibre. Review the source values before saving.',
+    warnings=['FDDB values are imported as published per 100 '+page.basis_unit+'. Carbohydrates are not reduced by fibre. Review the source values before saving.',
               'Missing or unsupported values remain unknown. Food water stays in grams, not drinking-water volume.']
     return {'name_de':page.title,'name_en':page.title,'notes':'Imported from FDDB\nSource: '+url+'\n'+'\n'.join(warnings),
-            'nutrients':nutrients,'ethanol_g_per100':ethanol,'warnings':warnings,'skipped':skipped,
-            'source':{'provider':'FDDB','url':url,'imported_at':datetime.now(timezone.utc).isoformat(),'basis_g':100,'values':original,'carbohydrate_conversion':None}}
+            'nutrients':nutrients,'basis_unit':page.basis_unit,'ethanol_g_per100':ethanol,'warnings':warnings,'skipped':skipped,
+            'source':{'provider':'FDDB','url':url,'imported_at':datetime.now(timezone.utc).isoformat(),'basis_g':100 if page.basis_unit=='g' else None,'basis_ml':100 if page.basis_unit=='ml' else None,'values':original,'carbohydrate_conversion':None}}
 
 async def fetch(url):
+    url=canonical_url(url)
     try:
         async with httpx.AsyncClient(timeout=15,follow_redirects=False,headers={'User-Agent':'Friss/1.20 (self-hosted nutrition importer)','Accept':'text/html'}) as client:
-            async with client.stream('GET',url) as response:
-                if response.status_code==404:raise HTTPException(404,'FDDB food page not found')
-                if response.status_code!=200:raise HTTPException(502,'FDDB could not be imported (blocked, unavailable or redirected). Try again later.')
-                if 'text/html' not in response.headers.get('content-type','').lower():raise HTTPException(422,'Expected an FDDB HTML page')
-                content=bytearray()
-                async for chunk in response.aiter_bytes():
-                    content.extend(chunk)
-                    if len(content)>common.MAX_BYTES:raise HTTPException(422,'Source page is too large')
-                return bytes(content).decode(response.encoding or 'utf-8',errors='replace')
+            for _ in range(4):
+                async with client.stream('GET',url) as response:
+                    if response.status_code in (301,302,303,307,308):
+                        try:url=canonical_url(urljoin(url,response.headers.get('location','')))
+                        except HTTPException:raise HTTPException(502,'FDDB redirected outside a supported food page')
+                        continue
+                    if response.status_code==404:raise HTTPException(404,'FDDB food page not found')
+                    if response.status_code!=200:raise HTTPException(502,'FDDB could not be imported (blocked or unavailable). Try again later.')
+                    if 'text/html' not in response.headers.get('content-type','').lower():raise HTTPException(422,'Expected an FDDB HTML page')
+                    content=bytearray()
+                    async for chunk in response.aiter_bytes():
+                        content.extend(chunk)
+                        if len(content)>common.MAX_BYTES:raise HTTPException(422,'Source page is too large')
+                    return bytes(content).decode(response.encoding or 'utf-8',errors='replace')
+            raise HTTPException(502,'Too many FDDB redirects')
     except httpx.HTTPError:raise HTTPException(502,'FDDB could not be reached; try again later')

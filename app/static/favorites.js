@@ -1,3 +1,4 @@
+function favoriteBasisUnit(){return $('favoriteKind').value==='manual'&&typeof manualBasisUnit==='function'?manualBasisUnit($('favoriteManual').value):'g';}
 Object.assign(words.de,{favorites:'Favoriten',recentIngredients:'Zuletzt benutzt',filterIngredients:'Lebensmittel filtern',reuseHint:'Auswählen, Menge und Zeitpunkt prüfen, dann speichern. Die letzten 100 unterschiedlichen Lebensmittel aus Tagebuch und Rezeptzutaten.',manageFavorites:'Favoriten verwalten',favoriteHint:'Vorlagen mit Vorschlagsmengen verwalten. Ändern oder Löschen verändert keine bereits gebuchten Mahlzeiten.',newFavorite:'Neuer Favorit',editFavorite:'Favorit bearbeiten',fromRecent:'Aus zuletzt benutzten übernehmen',noRecent:'Noch keine wiederverwendbaren Lebensmittel.',noFavorites:'Noch keine Favoriten. Auf der Favoritenseite hinzufügen.',useIngredient:'Verwenden',edit:'Bearbeiten',confirmDeleteFavorite:'Diesen Favoriten wirklich löschen? Bereits gebuchte Einträge bleiben erhalten.',reusePending:'Bitte den ausstehenden Eintrag zuerst speichern oder abbrechen.',recipeIngredient:'Rezeptzutat',dailyIngredient:'Tagebuch',favoriteChosen:'Übernommen. Menge und Zeitpunkt prüfen und speichern.',reusableLoadError:'Zuletzt benutzt / Favoriten konnten nicht geladen werden.'});
 Object.assign(words.en,{favorites:'Favorites',recentIngredients:'Recently used',filterIngredients:'Filter foods',reuseHint:'Select, check the amount and time, then save. The last 100 distinct foods from the journal and recipe ingredients.',manageFavorites:'Manage favorites',favoriteHint:'Manage templates with suggested amounts. Editing or deleting does not change logged meals.',newFavorite:'New favorite',editFavorite:'Edit favorite',fromRecent:'Use a recently used ingredient',noRecent:'No reusable ingredients yet.',noFavorites:'No favorites yet. Add them on the Favorites page.',useIngredient:'Use',edit:'Edit',confirmDeleteFavorite:'Really delete this favorite? Logged entries will be kept.',reusePending:'Please save or cancel the pending entry first.',recipeIngredient:'Recipe ingredient',dailyIngredient:'Journal',favoriteChosen:'Filled in. Check the amount and time, then save.',reusableLoadError:'Could not load recently used foods / favorites.'});
 let recentIngredients=[],favoriteItems=[],reuseMode=null,reuseGeneration=0,favoriteEditing=null,favoriteDraft=null,favoriteSearchGeneration=0;
@@ -45,7 +46,7 @@ function useReusable(item){
  if(kind==='item'){selected={bls_code:e.bls_code,display_name:reusableName(item)};$('selected').textContent=reusableName(item);$('search').value=reusableName(item);}
  if(kind==='barcode')$('description').value=e.barcode;
  if(kind==='text')$('description').value=e.description;
- $('amount').value=e.quantity?.value??'';
+ $('amount').value=kind==='manual'&&e.quantity?.unit!==captureAmountUnit()?'':e.quantity?.value??'';
  if(kind==='coffee')$('caffeineInput').value=e.caffeine_mg??'';
  if(kind==='alcohol')$('abv').value=e.alcohol_abv??'';
  reuseMode=null;renderReusable();$('amount').focus();message(t('favoriteChosen'));
@@ -60,7 +61,7 @@ function favoriteFields(){
  $('favoriteDescriptionGroup').hidden=!['barcode','text'].includes(kind);$('favoriteDescription').required=['barcode','text'].includes(kind);$('favoriteDescription').disabled=!['barcode','text'].includes(kind);
  $('favoriteCaffeineGroup').hidden=kind!=='coffee';$('favoriteCaffeine').required=kind==='coffee';$('favoriteCaffeine').disabled=kind!=='coffee';
  $('favoriteAlcoholModeGroup').hidden=kind!=='alcohol';const direct=kind==='alcohol'&&$('favoriteAlcoholMode').value==='g';$('favoriteAlcoholGroup').hidden=kind!=='alcohol'||direct;$('favoriteAlcohol').required=kind==='alcohol'&&!direct;$('favoriteAlcohol').disabled=kind!=='alcohol'||direct;
- $('favoriteAmount').required=drink;$('favoriteAmountLabel').textContent=t(direct?'alcoholGrams':drink?'volume':'amount');
+ $('favoriteAmount').required=drink;$('favoriteAmountLabel').textContent=t(direct?'alcoholGrams':drink||favoriteBasisUnit()==='ml'?'volume':'amount');
 }
 function editFavorite(item=null){
  favoriteSearchGeneration++;favoriteEditing=item?.id?item:null;favoriteDraft=null;
@@ -70,10 +71,11 @@ function editFavorite(item=null){
  $('favoriteKind').value=entry?.type==='drink'?entry.drink:entry?.type||'item';
  if(entry?.type==='manual')ensureManualOption('favoriteManual',entry.manual_id,reusableName(item));else $('favoriteManual').value='';$('favoriteCode').value=entry?.bls_code||'';$('favoriteDescription').value=entry?.barcode||entry?.description||'';
  $('favoriteAlcoholMode').value=entry?.drink==='alcohol'&&entry.quantity?.unit==='g'?'g':'ml';$('favoriteAmount').value=entry?.quantity?.value??'';$('favoriteCaffeine').value=entry?.caffeine_mg??'';$('favoriteAlcohol').value=entry?.alcohol_abv??'';
- favoriteFields();$('favoriteLabel').focus();
+ favoriteFields();if(entry?.type==='manual'&&entry.quantity&&entry.quantity.unit!==favoriteBasisUnit())$('favoriteAmount').value='';$('favoriteLabel').focus();
 }
 $('newFavorite').onclick=()=>editFavorite();
 $('cancelFavorite').onclick=()=>editFavorite();
+$('favoriteManual').onchange=favoriteFields;
 $('favoriteKind').onchange=()=>{favoriteSearchGeneration++;favoriteFields();};
 $('favoriteRecent').onchange=()=>{const r=recentIngredients[Number($('favoriteRecent').value)];if($('favoriteRecent').value&&r)editFavorite(r);};
 $('favoriteFoodSearch').oninput=async()=>{
@@ -92,7 +94,7 @@ $('favoriteFoodSearch').oninput=async()=>{
 $('favoriteForm').onsubmit=async event=>{
  event.preventDefault();const button=event.submitter;button.disabled=true;
  const kind=$('favoriteKind').value,drink=['water','coffee','alcohol'].includes(kind);
- const entry={type:drink?'drink':kind,quantity:$('favoriteAmount').value?{value:Number($('favoriteAmount').value),unit:drink?kind==='alcohol'&&$('favoriteAlcoholMode').value==='g'?'g':'ml':'g'}:null};
+ const entry={type:drink?'drink':kind,quantity:$('favoriteAmount').value?{value:Number($('favoriteAmount').value),unit:drink?kind==='alcohol'&&$('favoriteAlcoholMode').value==='g'?'g':'ml':favoriteBasisUnit()}:null};
  if(kind==='manual')entry.manual_id=$('favoriteManual').value;
  if(kind==='item')entry.bls_code=$('favoriteCode').value.trim();
  if(kind==='barcode')entry.barcode=$('favoriteDescription').value.trim();

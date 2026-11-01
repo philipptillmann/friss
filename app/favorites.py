@@ -74,7 +74,9 @@ def install(app,db,auth,Entry):
             if not e.quantity or e.quantity.unit!='ml' and not (e.drink=='alcohol' and e.quantity.unit=='g'): raise HTTPException(422,'Drink amount in ml required')
             if e.drink=='coffee' and e.caffeine_mg is None: raise HTTPException(422,'Caffeine amount required')
             if e.drink=='alcohol' and e.quantity.unit=='ml' and e.alcohol_abv is None: raise HTTPException(422,'Alcohol content required')
-        elif e.quantity and e.quantity.unit!='g': raise HTTPException(422,'Food amount must use grams')
+        elif e.quantity:
+            expected=load(db,e.manual_id).get('basis_unit','g') if e.type=='manual' else 'g'
+            if e.quantity.unit!=expected:raise HTTPException(422,'Food amount must use '+expected)
         return body.model_dump(mode='json')
 
     @app.get('/recent-ingredients',dependencies=[Depends(auth)])

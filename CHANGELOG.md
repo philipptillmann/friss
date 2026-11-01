@@ -1,3 +1,10 @@
+## 1.37.0 — FDDB-Mobile-Links und Nährwerte pro 100 ml
+
+- #81: Neue `fddb.mobi/de/…html`-Produktlinks samt mobiler Nährwertliste und Mineralstofftabellen unterstützen; bisherige `fddb.info`-Links bleiben gültig.
+- Bezugsmenge 100 g/100 ml erkennen, speichern und bei eigenen Zutaten, gemeinsamer Suche, Rezepten, Favoriten und zuletzt verwendeten Mengen berücksichtigen. Keine automatische Dichteannahme.
+- Salz gegebenenfalls zu Natrium umrechnen und „Chlor“ als Chlorid übernehmen. Originalwerte und Quellenbasis erhalten; Portionswerte nicht doppelt importieren.
+- FDDB-Weiterleitungen auf erlaubte Produktseiten begrenzen. Live-Bitburger-Link und mobilen Import-/Verzehrablauf geprüft.
+
 ## 1.36.0 — BLS-Synonyme und Suchvorschläge verwalten
 
 - #80: Einstellungen zum Anlegen, Bearbeiten und Löschen eigener Suchbegriffe mit explizitem BLS-Ziel und Suchsprache ergänzen.

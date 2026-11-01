@@ -29,18 +29,21 @@ class ImportSource(BaseModel):
     provider:Literal['FoodData Explorer','FDDB']
     url:str=Field(max_length=2000)
     imported_at:datetime
-    basis_g:Literal[100]
+    basis_g:Literal[100]|None=100
+    basis_ml:Literal[100]|None=None
     values:list[SourceValue]=Field(max_length=1000)
     carbohydrate_conversion:CarbohydrateConversion|None=None
     @model_validator(mode='after')
     def valid(self):
         self.url=(fddb_import if self.provider=='FDDB' else fooddata_import).canonical_url(self.url)
+        if (self.basis_g is None)==(self.basis_ml is None):raise ValueError('Exactly one source basis required')
         if self.imported_at.utcoffset() is None:raise ValueError('Import timestamp requires timezone')
         return self
 
 class ManualEdit(BaseModel):
     name_de:str=Field(min_length=1,max_length=200)
     name_en:str=Field(default='',max_length=200)
+    basis_unit:Literal['g','ml']='g'
     notes:str=Field(default='',max_length=10000)
     nutrients:dict[str,Nutrient]
     source:ImportSource|None=None
@@ -48,6 +51,7 @@ class ManualEdit(BaseModel):
     version:int=Field(ge=0)
     @model_validator(mode='after')
     def valid(self):
+        if self.source and self.source.basis_ml and 'basis_unit' not in self.model_fields_set:self.basis_unit='ml'
         self.name_de=self.name_de.strip();self.name_en=self.name_en.strip() or self.name_de
         if not self.name_de:raise ValueError('Name required')
         if not self.nutrients and self.ethanol_g_per100 is None:raise ValueError('Enter at least one nutrient')

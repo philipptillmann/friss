@@ -79,7 +79,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.36.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.37.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -192,8 +192,8 @@ async def process(e, reuse_off=False):
         e['manual_snapshot']=snapshot
         food={'name_de':snapshot['name_de'],'name_en':snapshot['name_en'],'manual_id':snapshot['id']}
         e['food']=food;e['source']={'provider':'Manual','id':snapshot['id'],'version':snapshot['version']}
-        raw=snapshot['nutrients'];basis='g'
-        if q and q['unit']=='g' and snapshot.get('ethanol_g_per100') is not None:
+        raw=snapshot['nutrients'];basis=snapshot.get('basis_unit','g')
+        if q and q['unit']==basis and snapshot.get('ethanol_g_per100') is not None:
             e['ethanol_g']=snapshot['ethanol_g_per100']*q['value']/100
     elif e.get('bls_code') or e['type'] == 'text':
         with db() as c:
@@ -232,7 +232,7 @@ async def process(e, reuse_off=False):
     if not food:
         return
     if not q or q['unit'] != basis:
-        e['reason'] = 'Quantity in grams required; ml needs density conversion'
+        e['reason'] = 'Quantity in '+basis+' required; no automatic mass/volume conversion'
         return
     for key, item in raw.items():
         value = item['value']
