@@ -490,3 +490,7 @@ Unter **Statistik → Tagesprüfung** einzelne Tage durchblättern und jeden Tag
 ### BLS-Suche nach Wortbestandteilen (v1.40.1)
 
 Die Suche findet auch Wortbestandteile, etwa **Speisesalz** bei **Salz**. Exakte Namen stehen zuerst, anschließend werden kürzere passende Namen vor langen Treffern mit demselben Wortanfang angezeigt. Die Sortierung erfolgt vor der Begrenzung der Vorschläge und gilt auch in der gemeinsamen Suche. Eigene Synonyme und bereits gelernte Suchzuordnungen behalten Vorrang.
+
+### Mahlzeiten aus BLS per API (v1.41.0)
+
+KI/Kurzbefehle können mit `GET /bls/search?q=...` echte BLS-Codes finden und mit `POST /bls/meals` Lebensmittel samt Grammengen gemeinsam ins Tagebuch eintragen. Friss berechnet die Nährwerte. `POST /bls/meals/preview` zeigt vorab die Ergebnisse ohne Speicherung. Datum mit Zeitzone wird vom Kurzbefehl gesetzt; IDs entstehen auf dem Server und identische Wiederholungen erzeugen keine Duplikate. [Anleitung mit API-Beispielen, Kurzbefehl und KI-Nachricht](docs/BLS_API.md).

@@ -1,3 +1,10 @@
+## 1.41.0 — BLS-Mahlzeiten-API für KI und Kurzbefehle
+
+- #87: Kompakte authentifizierte BLS-Suche unter GET /bls/search ergänzen, mit deutschen/englischen Namen, echten Codes, Synonymen und persönlicher Sortierung.
+- POST /bls/meals akzeptiert BLS-Codes und Grammengen und berechnet Nährwerte auf dem Server. POST /bls/meals/preview zeigt dieselbe Berechnung ohne Speicherung.
+- Bestehende atomare Importverarbeitung nutzen: Originaldaten, gemeinsame Metadaten, serverseitige IDs und sichere identische Wiederholungen. Ungültige Codes/Mengen/Zeitzonen vor dem Schreiben ablehnen.
+- Kurzbefehl-Ablauf, Beispielanfragen und KI-Nachricht dokumentieren; bestehende Nährwert-Import-API erhalten.
+
 ## 1.40.1 — BLS-Suche nach Wortbestandteilen verbessern
 
 - #86: Kurze passende Namen wie Speisesalz bei der Suche nach Salz vor langen Treffern mit gleichem Wortanfang anzeigen, bevor die Ergebnisliste begrenzt wird.

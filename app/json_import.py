@@ -288,3 +288,6 @@ def install(app,db,auth,Entry,process,data_dir,normalize):
         immutable(data_dir()/'originals'/f'request-{batch}.json',json.dumps(body.model_dump(mode='json'),sort_keys=True,indent=2))
         result=await commit(Commit(id=batch,raw=json.dumps(meal.model_dump(mode='json',by_alias=True),sort_keys=True),timestamp=body.timestamp,items=[item]))
         return {**result,'entry_id':result['entry_ids'][0],'photo_upload_url':'/entries/'+result['entry_ids'][0]+'/photos','title':ai.title,'timestamp':body.timestamp.isoformat(),'nutrients':{k:n.model_dump() for k,n in ai.nutrients.items() if n is not None}}
+
+    from . import bls_api
+    bls_api.install(app,db,auth,normalize,Entry,process,commit)
