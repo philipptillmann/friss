@@ -1,3 +1,9 @@
+## 1.40.1 — BLS-Suche nach Wortbestandteilen verbessern
+
+- #86: Kurze passende Namen wie Speisesalz bei der Suche nach Salz vor langen Treffern mit gleichem Wortanfang anzeigen, bevor die Ergebnisliste begrenzt wird.
+- Dieselbe Relevanz in der BLS- und der gemeinsamen Suche verwenden. Persönliche Suchzuordnungen und angelegte Synonyme behalten Vorrang.
+- Regressionstests für viele konkurrierende Wortanfänge, deutsche/englische Wortbestandteile, exakte Treffer und gelernte Auswahl ergänzen.
+
 ## 1.40.0 — Nährwert-Tagesprüfung für den Computer
 
 - #85: Unter Statistik zwischen Verlauf und Tagesprüfung wechseln. Einzelne Tage mit Pfeilen, Datumswahl und Heute-Button durchsuchen.

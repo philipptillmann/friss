@@ -62,3 +62,18 @@ class UnifiedSearchTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(results[0]['id'],'SUGAR')
         alias=(await self.client.get('/search',params={'q':'Mein Zucker','remote':'false'})).json()['results']
         self.assertEqual(alias[0]['id'],'SUGAR');self.assertTrue(alias[0]['favorite'])
+
+    async def test_salt_compound_visible_and_learnable_before_limits(self):
+        with main.db() as c:
+            for code,name in [('TABLE_SALT','Speisesalz')]+[(f'PREFIX{i}','Salzgebäck mit Kräutern '+str(i)) for i in range(35)]:
+                food={'bls_code':code,'name_de':name,'name_en':name,'nutrients':{}}
+                c.execute('INSERT INTO foods VALUES(?,?,?)',(code,json.dumps(food),main.normalize(name)))
+        async def search():
+            return (await self.client.get('/search',params={'q':'Salz','remote':'false'})).json()['results']
+        results=await search()
+        self.assertEqual(results[0]['id'],'TABLE_SALT')
+        self.assertEqual(len(results),15)
+        chosen=next(r for r in results if r['id']=='PREFIX0')
+        response=await self.client.post('/search/selections',json={'id':str(uuid4()),'query':'Salz','token':chosen['selection_token']})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual((await search())[0]['id'],'PREFIX0')

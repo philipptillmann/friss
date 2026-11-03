@@ -486,3 +486,7 @@ Beim Bearbeiten gespeicherter manueller Zutaten, Rezepte und Getränke zwischen 
 ### Tagesprüfung der Nährwerte (v1.40.0)
 
 Unter **Statistik → Tagesprüfung** einzelne Tage durchblättern und jeden Tagebucheintrag als Zeile mit allen Nährstoffen als Spalten prüfen. Die breite Desktop-Tabelle zeigt Quellen, fehlende/ungeprüfte Werte und Null-Annahmen sowie bekannte Spaltensummen. Eintragsnamen öffnen Details in einem neuen Tab. Der bisherige Statistikbereich bleibt unter **Verlauf**. [Anleitung](docs/DAILY_AUDIT.md).
+
+### BLS-Suche nach Wortbestandteilen (v1.40.1)
+
+Die Suche findet auch Wortbestandteile, etwa **Speisesalz** bei **Salz**. Exakte Namen stehen zuerst, anschließend werden kürzere passende Namen vor langen Treffern mit demselben Wortanfang angezeigt. Die Sortierung erfolgt vor der Begrenzung der Vorschläge und gilt auch in der gemeinsamen Suche. Eigene Synonyme und bereits gelernte Suchzuordnungen behalten Vorrang.

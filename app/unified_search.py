@@ -95,7 +95,7 @@ def install(app,db,auth,normalize):
         preferences.update({(row['source'],row['target']):(row['hits'],row['recent']) for row in learned if row['source']!='bls' or ('bls',row['target']) not in preferences})
         def rank(item):
             hits,recent=preferences.get((item['source'],item['id']),(0,0));name=food_search.term(item['label'],normalize)
-            return (item.get('synonym_priority',2),-hits,-recent,name!=query,not name.startswith(query),not item.get('favorite',False),len(name),item['label'],item['source'])
+            return (item.get('synonym_priority',2),-hits,-recent,*food_search.text_rank(name,query),not item.get('favorite',False),item['label'],item['source'])
         amounts=last_quantities(db)
         for key,item in candidates.items():
             if not item.get('default_quantity') and key in amounts:item['default_quantity']=amounts[key]

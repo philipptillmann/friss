@@ -65,3 +65,14 @@ class FoodSearchTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([f['bls_code'] for f in await self.results('10%')],['E'])
         self.assertEqual(await self.results('_'),[])
         self.assertEqual((await self.client.get('/foods',params={'q':'   '})).status_code,422)
+
+    async def test_short_compounds_survive_crowded_prefix_matches(self):
+        self.food('TABLE_SALT','Speisesalz','Table salt')
+        for i in range(35):
+            self.food(f'PREFIX{i}','Salzgebäck mit Kräutern '+str(i),'Salted pastry with herbs '+str(i))
+        self.assertEqual((await self.results('Salz',limit=1))[0]['bls_code'],'TABLE_SALT')
+        self.assertEqual((await self.results('salt',lang='en',limit=1))[0]['bls_code'],'TABLE_SALT')
+        self.food('EXACT','Salz','Salt')
+        self.assertEqual((await self.results('Salz',limit=1))[0]['bls_code'],'EXACT')
+        await self.pick('Salz','PREFIX0')
+        self.assertEqual((await self.results('Salz',limit=1))[0]['bls_code'],'PREFIX0')

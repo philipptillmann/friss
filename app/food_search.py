@@ -22,6 +22,11 @@ def term(query,normalize):
 def pattern(query):
     return '%'+query.replace('\\','\\\\').replace('%','\\%').replace('_','\\_')+'%'
 
+def text_rank(name,query):
+    # A short compound (Speisesalz) is more useful than a long prefix match
+    # (Salzgebäck ...). Apply this before limiting candidates in either API.
+    return (name!=query,len(name),not name.startswith(query))
+
 def search(db,normalize,q,lang,limit):
     query=term(q,normalize)
     if not query: raise HTTPException(422,'Search term required')
@@ -45,7 +50,7 @@ def search(db,normalize,q,lang,limit):
         # Personal choices rank first, then a predictable text relevance fallback.
         alias=matched.get(row['code'])
         priority=0 if alias and not alias[0][0] else 1 if alias else 2
-        rank=(priority,-row['hits'],-row['last_selection'],name!=query,not name.startswith(query),len(name),name,row['code'])
+        rank=(priority,-row['hits'],-row['last_selection'],*text_rank(name,query),name,row['code'])
         ranked.append((rank,{'display_name':food['name_'+lang],**food,'synonym':alias[1] if alias else None,'synonym_priority':priority}))
     return [food for _,food in sorted(ranked,key=lambda pair:pair[0])[:limit]]
 
