@@ -1,6 +1,14 @@
-# Friss API · Version 1.0.0
+# Friss · Version 1.41.0
 
-Self-hosted Ernährungserfassung für Debian/Docker und iPhone-Kurzbefehle. Deutsche und englische BLS-Namen, unveränderliche Originale, SQLite, Open Food Facts und Health-Export-Reservierungen. Keine fertige iPhone-App oder Foto-KI.
+Self-hosted food and drink tracking for Debian/Docker, web browsers and iPhone Shortcuts. Includes BLS/Open Food Facts search, recipes, manual foods, statistics, JSON imports, backups and Apple Health export preparation.
+
+## User manuals / Benutzerhandbücher
+
+- **[English user manual — current version 1.41.0](docs/USER_MANUAL_EN.md)**
+- **[Deutsches Benutzerhandbuch — aktuelle Version 1.41.0](docs/USER_MANUAL_DE.md)**
+
+The manuals describe current workflows. The sections below also preserve historical release notes and API setup examples; use the manuals when older instructions differ.
+Die Handbücher beschreiben die aktuellen Abläufe. Die folgenden Abschnitte enthalten auch historische Versionshinweise und API-Beispiele; bei abweichenden älteren Angaben gelten die Handbücher.
 
 ## Start auf Debian
 

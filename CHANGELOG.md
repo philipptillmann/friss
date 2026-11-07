@@ -1,3 +1,8 @@
+## Documentation — 7 November 2026
+
+- #88: Add matching English and German user manuals for v1.41.0, with all nine pages, everyday workflows, imports/APIs, data completeness, history corrections, Health export, backups and server operation.
+- Link the manuals prominently from README and identify older instructions as historical. Documentation only; application version remains 1.41.0.
+
 ## 1.41.0 — BLS-Mahlzeiten-API für KI und Kurzbefehle
 
 - #87: Kompakte authentifizierte BLS-Suche unter GET /bls/search ergänzen, mit deutschen/englischen Namen, echten Codes, Synonymen und persönlicher Sortierung.
