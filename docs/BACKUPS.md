@@ -46,3 +46,5 @@ These ZIP backups are separate from nutrition JSON imports and Apple Health day 
 From v1.36.0 backups include the `food_synonyms` table. Earlier v1 ZIPs without this table remain restorable, using an empty synonym list (full replacement, not a merge).
 
 From v1.42.0 backups include `planning_records` (planning/inventory settings, recipe plans/snapshots, fridge stock, shopping items and checks). Earlier ZIPs restore this collection as empty. Restore a new backup with v1.42.0 or newer; older applications reject the added table.
+
+From v1.43.0 backups include `inbox_records` and captured original text/photos, including completed/deleted-item archive records. Earlier ZIPs restore an empty inbox. Restore new inbox archives with v1.43.0 or newer.

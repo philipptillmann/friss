@@ -39,8 +39,9 @@ def copy(data,source,target):
         destination=photo.with_name(str(target)+photo.name[len(str(source)):])
         immutable(destination,photo.read_bytes())
 
-def install(app,db,auth,load_entry,data_dir):
-    @app.put('/entries/{id}/photos',dependencies=[Depends(auth)])
+def install(app,db,auth,load_entry,data_dir,prefix='/entries',record_table='entries',upload_guard=None):
+    def public(value):return {**value,'url':value['url'].replace('/entries/',prefix+'/',1)}
+    @app.put(prefix+'/{id}/photos',dependencies=[Depends(auth)])
     async def upload(id:UUID,request:Request):
         load_entry(id)
         content=bytearray()
@@ -60,17 +61,18 @@ def install(app,db,auth,load_entry,data_dir):
         path=data_dir()/'originals'/f'{id}-photo-{photo_id}.{extension}'
         with db() as c:
             c.execute('BEGIN IMMEDIATE')
-            if not c.execute('SELECT id FROM entries WHERE id=?',(str(id),)).fetchone():raise HTTPException(404,'Entry not found')
+            if upload_guard:upload_guard(c,id)
+            if not c.execute('SELECT id FROM '+record_table+' WHERE id=?',(str(id),)).fetchone():raise HTTPException(404,'Entry not found')
             if not path.exists() and len(stored(data_dir(),id))>=MAX_PHOTOS:raise HTTPException(422,'Maximum 20 photos per entry')
             immutable(path,content)
-        return metadata(path,id)
+        return public(metadata(path,id))
 
-    @app.get('/entries/{id}/photos',dependencies=[Depends(auth)])
+    @app.get(prefix+'/{id}/photos',dependencies=[Depends(auth)])
     async def photos(id:UUID):
         load_entry(id)
-        return listing(data_dir(),id)
+        return [public(p) for p in listing(data_dir(),id)]
 
-    @app.get('/entries/{id}/photos/{photo_id}',dependencies=[Depends(auth)])
+    @app.get(prefix+'/{id}/photos/{photo_id}',dependencies=[Depends(auth)])
     async def original(id:UUID,photo_id:str):
         load_entry(id)
         if not re.fullmatch(r'[a-f0-9]{64}',photo_id):raise HTTPException(404,'Photo not found')

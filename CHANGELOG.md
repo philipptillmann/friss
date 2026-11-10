@@ -1,3 +1,10 @@
+## 1.43.0 — Unfinished text/photo inbox
+
+- #90: Add a dedicated de/en Inbox page for timestamped text, pictures or both, sorted by capture time and separate from diary/nutrient/Health totals.
+- Add authenticated capture/list/detail/delete/photo APIs for Shortcuts, server-generated IDs, identical-request retries, immutable originals and safe repeated image uploads.
+- Continue a draft by choosing a BLS/manual/OFF food or saved recipe and amount/time; explicitly complete once into the diary, retaining provenance and copied photos. Failed resolution leaves the draft pending.
+- Include inbox data in ZIP backups, restore earlier archives with an empty inbox, and document browser and Shortcut workflows in both languages.
+
 ## 1.42.0 — Meal planning, fridge inventory and shopping
 
 - #89: Add planned food/drink recipe meals, date ranges, preparation flags, recipe notes and immutable planning snapshots. Explicitly mark eaten at an actual timestamp to create one diary entry; retry-safe and excluded from nutrition/Health until then.

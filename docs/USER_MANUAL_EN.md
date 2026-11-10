@@ -1,6 +1,6 @@
 # Friss user manual
 
-**For version 1.42.0 · Updated 10 November 2026**
+**For version 1.43.0 · Updated 10 November 2026**
 [Deutsches Handbuch](USER_MANUAL_DE.md) · [Project overview](../README.md)
 
 Friss is a self-hosted food and drink diary. Your server stores entries, original inputs, recipes and nutrient data. You can use the browser on a computer or add the site to your iPhone Home Screen. It is a web app, not a native iPhone app. Apple Health writes require a separate iPhone Shortcut.
@@ -26,13 +26,15 @@ Friss is a self-hosted food and drink diary. Your server stores entries, origina
 
 17. [Meal planning, fridge inventory and shopping](#17-meal-planning-fridge-inventory-and-shopping)
 
+18. [Unfinished-entry inbox](#18-unfinished-entry-inbox)
+
 ## 1. Getting started
 
 Open your server's Friss address, for example `http://spiesserver:8001/`, and sign in with the configured password. Use the actual hostname/IP and port of your installation. The server must be reachable from your device; away from home, connect your VPN first. Friss does not support offline capture.
 
 On iPhone, open the site in Safari, choose **Share → Add to Home Screen**, and launch it from the new icon. Safari and the installed web app may have separate login sessions. Sessions last up to 30 days; signing out or changing the server password ends the applicable sessions. Apple Passwords can help fill the login form.
 
-Choose English or German at the top. The navigation contains **Home, Meals, Drinks, Recipes, Favorites, Manual, Statistics, Export, Settings**, plus **Meal planner, Fridge and Shopping list**. Labels below refer to the English interface; button wording may vary slightly with language.
+Choose English or German at the top. The navigation contains **Home, Meals, Drinks, Recipes, Favorites, Manual, Statistics, Export, Settings**, plus **Meal planner, Fridge, Shopping list and Inbox**. Labels below refer to the English interface; button wording may vary slightly with language.
 
 For a first test, set your goals in Settings, search for a food under Meals, enter its amount and save. Check Home and Statistics before setting up Health export or automation.
 
@@ -327,3 +329,9 @@ When reporting a problem, include app version, page, exact steps and the error t
 Use **Meal planner** to schedule saved food/drink recipes, portions and preparation notes. Mark **Prepared** to track meal prep; **Mark eaten** with the actual time creates the diary entry. Plans retain their saved recipe version. **Fridge** stores source-linked quantities and expiry reminders. **Shopping list** combines ingredients for your range and subtracts matching stock, with purchased checkboxes and manual items.
 
 Under Settings, planning and inventory can be switched off independently without deleting their data. Shopping stays available. Stock quantities are maintained manually: eating and checking purchases do not change them. Backups include all new records. [Complete English/German workflow, boundaries and API](PLANNING.md).
+
+## 18. Unfinished-entry inbox
+
+Use **Inbox** to capture text, pictures or both with their original date/time. Unfinished items do not affect nutrition, statistics, BAC or Health. Open a draft, review originals and select a food or recipe with its amount/time to complete exactly one diary entry. Text and photos remain attached. Keep unknown amounts pending until you can complete them.
+
+A Shortcut can POST timestamp/text/title to `/inbox`, then PUT picture files to its returned `photo_upload_url`. No nutrients, AI output or client UUID is needed. Identical retries avoid duplicates. Inbox data is included in backups. [Complete English/German instructions and API](INBOX.md).
