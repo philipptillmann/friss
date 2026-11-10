@@ -1,11 +1,11 @@
-# Friss · Version 1.41.0
+# Friss · Version 1.42.0
 
 Self-hosted food and drink tracking for Debian/Docker, web browsers and iPhone Shortcuts. Includes BLS/Open Food Facts search, recipes, manual foods, statistics, JSON imports, backups and Apple Health export preparation.
 
 ## User manuals / Benutzerhandbücher
 
-- **[English user manual — current version 1.41.0](docs/USER_MANUAL_EN.md)**
-- **[Deutsches Benutzerhandbuch — aktuelle Version 1.41.0](docs/USER_MANUAL_DE.md)**
+- **[English user manual — current version 1.42.0](docs/USER_MANUAL_EN.md)**
+- **[Deutsches Benutzerhandbuch — aktuelle Version 1.42.0](docs/USER_MANUAL_DE.md)**
 
 The manuals describe current workflows. The sections below also preserve historical release notes and API setup examples; use the manuals when older instructions differ.
 Die Handbücher beschreiben die aktuellen Abläufe. Die folgenden Abschnitte enthalten auch historische Versionshinweise und API-Beispiele; bei abweichenden älteren Angaben gelten die Handbücher.
@@ -502,3 +502,7 @@ Die Suche findet auch Wortbestandteile, etwa **Speisesalz** bei **Salz**. Exakte
 ### Mahlzeiten aus BLS per API (v1.41.0)
 
 KI/Kurzbefehle können mit `GET /bls/search?q=...` echte BLS-Codes finden und mit `POST /bls/meals` Lebensmittel samt Grammengen gemeinsam ins Tagebuch eintragen. Friss berechnet die Nährwerte. `POST /bls/meals/preview` zeigt vorab die Ergebnisse ohne Speicherung. Datum mit Zeitzone wird vom Kurzbefehl gesetzt; IDs entstehen auf dem Server und identische Wiederholungen erzeugen keine Duplikate. [Anleitung mit API-Beispielen, Kurzbefehl und KI-Nachricht](docs/BLS_API.md).
+
+### Planning, fridge inventory and shopping (v1.42.0)
+
+Plan saved recipes without logging consumption; explicitly mark eaten when consumed. Maintain source-linked stock and generate a combined shopping list for a date range. Planning and inventory have independent Settings toggles; disabling preserves data. Stock changes are manual. [English and German guide](docs/PLANNING.md).

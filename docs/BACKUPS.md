@@ -44,3 +44,5 @@ All endpoints require the existing Friss authentication (Bearer API key or same-
 These ZIP backups are separate from nutrition JSON imports and Apple Health day exports. A `friss-meal-v1` or AI-meal JSON cannot be used as a full backup.
 
 From v1.36.0 backups include the `food_synonyms` table. Earlier v1 ZIPs without this table remain restorable, using an empty synonym list (full replacement, not a merge).
+
+From v1.42.0 backups include `planning_records` (planning/inventory settings, recipe plans/snapshots, fridge stock, shopping items and checks). Earlier ZIPs restore this collection as empty. Restore a new backup with v1.42.0 or newer; older applications reject the added table.

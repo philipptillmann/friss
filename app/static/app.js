@@ -122,11 +122,11 @@ $('destination').parentElement.querySelector('label[for="destination"]').hidden=
 function updatePageLabels(){ $('formTitle').textContent=editing?t('resolve'):recipePage()?t('ingredients'):t('add');$('listTitle').textContent=recipePage()?t('ingredients'):t('entries'); }
 function showPage(page){
  const detailId=page.startsWith('entry/')?page.slice(6):null;if(detailId)page='entry';
- if(!['home','meals','recipes','alcohol','settings','statistics','health','entry','favorites','manual'].includes(page))page='home';
+ if(!['home','meals','recipes','alcohol','settings','statistics','health','entry','favorites','manual','planner','inventory','shopping'].includes(page))page='home';
  if(page!==currentPage&&attempt){message(t('retry'),true);return;}
  if(page!==currentPage&&editing)reset();
  currentPage=page;
- for(const name of ['home','meals','recipes','alcohol','settings','statistics','health','entry','favorites','manual'])$('page-'+name).hidden=name!==page;
+ for(const name of ['home','meals','recipes','alcohol','settings','statistics','health','entry','favorites','manual','planner','inventory','shopping']){const section=$('page-'+name);if(section)section.hidden=name!==page;}
  document.querySelectorAll('[data-page]').forEach(b=>{b.setAttribute('aria-current',(b.dataset.page===page||(page==='entry'&&b.dataset.page==='meals'))?'page':'false');});
  if(page==='recipes'||page==='alcohol'){if(activeRecipe&&(recipeRows.find(r=>r.id===activeRecipe)?.category||'food')!==recipeCategory()){activeRecipe='';$('recipeForm').reset();$('recipeName').value='';$('recipeVolume').value='';$('recipeABV').value='';}$(page==='alcohol'?'drinkRecipeEditorHost':'foodRecipeEditorHost').append($('recipeEditor'),$('recipeCaptureHost'));renderRecipes();}
  const host=recipePage()?$('recipeCaptureHost'):$('mealCaptureHost');host.append($('entryPanel'),$('entriesPanel'));

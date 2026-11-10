@@ -1,3 +1,10 @@
+## 1.42.0 — Meal planning, fridge inventory and shopping
+
+- #89: Add planned food/drink recipe meals, date ranges, preparation flags, recipe notes and immutable planning snapshots. Explicitly mark eaten at an actual timestamp to create one diary entry; retry-safe and excluded from nutrition/Health until then.
+- Add editable fridge inventory with source-linked foods, quantities, units, dates and notes; shopping combines/scales planned ingredients and subtracts matching stock once per range. Manual shopping items and persistent purchased checks included.
+- Independent planning/inventory Settings switches hide/disable each feature while preserving its records; shopping remains usable. Stock changes remain manual.
+- Include planning data in backups, accept older backups with an empty planning collection, and document de/en workflows and APIs.
+
 ## Documentation — 7 November 2026
 
 - #88: Add matching English and German user manuals for v1.41.0, with all nine pages, everyday workflows, imports/APIs, data completeness, history corrections, Health export, backups and server operation.

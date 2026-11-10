@@ -16,7 +16,7 @@ import zipfile
 from fastapi import Depends,HTTPException,Request,Response
 from fastapi.responses import JSONResponse
 
-TABLES=('food_synonyms','foods','search_selections','food_search_selections','preferences','button_images','manual_ingredients','favorites','recipes','health_days','entries','json_import_batches')
+TABLES=('planning_records','food_synonyms','foods','search_selections','food_search_selections','preferences','button_images','manual_ingredients','favorites','recipes','health_days','entries','json_import_batches')
 ROOTS=('originals','bls')
 MAX_ZIP=128*1024*1024
 MAX_EXPANDED=512*1024*1024
@@ -97,6 +97,7 @@ def unpack(content,db):
             if not isinstance(doc.get('tables'),dict):raise ValueError('Missing data tables')
             # Backups from before v1.36.0 restore with no explicit synonyms.
             if 'food_synonyms' not in doc['tables']:doc['tables']['food_synonyms']=[]
+            if 'planning_records' not in doc['tables']:doc['tables']['planning_records']=[]
             if set(doc['tables'])!=set(TABLES):raise ValueError('Missing or unknown data tables')
             files=doc.get('files')
             if not isinstance(files,dict) or set(names)!={'backup.json',*files}:raise ValueError('Attachment manifest mismatch')

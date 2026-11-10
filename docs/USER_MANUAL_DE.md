@@ -1,6 +1,6 @@
 # Friss – Benutzerhandbuch
 
-**Für Version 1.41.0 · Stand: 7. November 2026**  
+**Für Version 1.42.0 · Stand: 10. November 2026**
 [English manual](USER_MANUAL_EN.md) · [Projektübersicht](../README.md)
 
 Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server speichert Einträge, Originaleingaben, Rezepte und Nährwertdaten. Du bedienst Friss im Browser am Computer oder über eine Verknüpfung auf dem iPhone-Home-Bildschirm. Friss ist eine Web-App, keine native iPhone-App. Zum Schreiben in Apple Health ist ein separater iPhone-Kurzbefehl erforderlich.
@@ -24,13 +24,15 @@ Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server 
 15. [Serverinstallation und Updates](#15-serverinstallation-und-updates)
 16. [Probleme lösen](#16-probleme-lösen)
 
+17. [Essensplanung, Vorrat und Einkaufsliste](#17-essensplanung-vorrat-und-einkaufsliste)
+
 ## 1. Erste Schritte
 
 Öffne die Friss-Adresse deines Servers, beispielsweise `http://spiesserver:8001/`, und melde dich mit dem eingerichteten Passwort an. Verwende den tatsächlichen Hostnamen beziehungsweise die IP und den Port deiner Installation. Dein Gerät muss den Server erreichen können; unterwegs zuerst das VPN verbinden. Eine Offline-Erfassung ist nicht implementiert.
 
 Auf dem iPhone öffnest du die Seite in Safari und wählst **Teilen → Zum Home-Bildschirm hinzufügen**. Starte Friss anschließend über das neue Icon. Safari und die installierte Web-App können getrennte Anmeldesitzungen haben. Eine Sitzung bleibt bis zu 30 Tage bestehen; Abmelden beziehungsweise eine Passwortänderung beendet die betreffenden Sitzungen. Apple Passwörter kann die Anmeldung ausfüllen.
 
-Oben kannst du Deutsch oder Englisch wählen. Das Menü enthält **Home, Mahlzeiten, Getränke, Rezepte, Favoriten, Manuell, Statistik, Export, Einstellungen**. Die folgenden Bezeichnungen beziehen sich auf die deutsche Oberfläche.
+Oben kannst du Deutsch oder Englisch wählen. Das Menü enthält **Home, Mahlzeiten, Getränke, Rezepte, Favoriten, Manuell, Statistik, Export, Einstellungen**, ergänzt um **Essensplanung, Vorrat und Einkaufsliste**. Die folgenden Bezeichnungen beziehen sich auf die deutsche Oberfläche.
 
 Für einen ersten Test: Ziele in den Einstellungen setzen, unter Mahlzeiten ein Lebensmittel suchen, Menge eingeben und speichern. Danach Home und Statistik prüfen, bevor du Health oder automatisierte Importe einrichtest.
 
@@ -319,3 +321,9 @@ Passwort ändern: Passwortskript ausführen und Container neu erstellen; alte Si
 | Oberfläche nach Update veraltet | Seite neu laden/öffnen. Bei Icon-Änderung gegebenenfalls Home-Screen-Verknüpfung entfernen und neu hinzufügen; Serverdaten bleiben erhalten. |
 
 Bei Fehlermeldungen App-Version, Seite, genaue Schritte und Fehlertext angeben. API-Schlüssel, Passwörter und persönliche Daten in Logs/Screenshots schwärzen.
+
+## 17. Essensplanung, Vorrat und Einkaufsliste
+
+Unter **Essensplanung** Rezepte/Getränke mit Menge und Vorbereitungsnotizen terminieren. **Vorbereitet** hält den Vorbereitungsstand fest; erst **Als gegessen eintragen** mit tatsächlichem Zeitpunkt bucht den Verzehr. Pläne behalten ihren gespeicherten Rezeptstand. **Vorrat** enthält verknüpfte Lebensmittelmengen und Datumshinweise. Die **Einkaufsliste** fasst Zutaten des Zeitraums zusammen und zieht passenden Vorrat ab; Häkchen und manuelle Artikel ergänzen die Liste.
+
+Planung und Vorrat lassen sich in Einstellungen unabhängig ausschalten, ohne Daten zu löschen. Einkaufen bleibt verfügbar. Bestand wird manuell gepflegt: Essen und Abhaken ändern ihn nicht. Sicherungen enthalten die neuen Daten. [Vollständiger deutscher/englischer Ablauf mit Grenzen und API](PLANNING.md).
