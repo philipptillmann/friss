@@ -1,6 +1,6 @@
 # Friss user manual
 
-**For version 1.43.0 · Updated 10 November 2026**
+**For version 1.44.0 · Updated 11 November 2026**
 [Deutsches Handbuch](USER_MANUAL_DE.md) · [Project overview](../README.md)
 
 Friss is a self-hosted food and drink diary. Your server stores entries, original inputs, recipes and nutrient data. You can use the browser on a computer or add the site to your iPhone Home Screen. It is a web app, not a native iPhone app. Apple Health writes require a separate iPhone Shortcut.
@@ -27,6 +27,8 @@ Friss is a self-hosted food and drink diary. Your server stores entries, origina
 17. [Meal planning, fridge inventory and shopping](#17-meal-planning-fridge-inventory-and-shopping)
 
 18. [Unfinished-entry inbox](#18-unfinished-entry-inbox)
+
+19. [Link barcodes to BLS](#19-link-barcodes-to-bls)
 
 ## 1. Getting started
 
@@ -335,3 +337,9 @@ Under Settings, planning and inventory can be switched off independently without
 Use **Inbox** to capture text, pictures or both with their original date/time. Unfinished items do not affect nutrition, statistics, BAC or Health. Open a draft, review originals and select a food or recipe with its amount/time to complete exactly one diary entry. Text and photos remain attached. Keep unknown amounts pending until you can complete them.
 
 A Shortcut can POST timestamp/text/title to `/inbox`, then PUT picture files to its returned `photo_upload_url`. No nutrients, AI output or client UUID is needed. Identical retries avoid duplicates. Inbox data is included in backups. [Complete English/German instructions and API](INBOX.md).
+
+## 19. Link barcodes to BLS
+
+Choose **Barcode → BLS** when entering a meal or recipe ingredient. Scan/type the barcode; if unknown, search BLS, select a food and save the link first. Future scans use its BLS nutrients directly. Enter grams; normal Barcode still uses Open Food Facts.
+
+Links can be changed/removed without altering existing entries. The chosen BLS profile is a substitute, not verified product data. [Complete bilingual guide and API](BARCODE_BLS.md).

@@ -48,6 +48,7 @@ async def lifespan(app):
         PRAGMA journal_mode=WAL;
         CREATE TABLE IF NOT EXISTS sessions(token TEXT PRIMARY KEY, expires REAL NOT NULL, password_version TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS login_attempts(client TEXT PRIMARY KEY, failures INTEGER NOT NULL, window REAL NOT NULL);
+        CREATE TABLE IF NOT EXISTS barcode_bls_links(barcode TEXT PRIMARY KEY,code TEXT,version INTEGER NOT NULL,updated_at TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS inbox_records(id TEXT PRIMARY KEY,fingerprint TEXT NOT NULL,payload TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS planning_records(kind TEXT NOT NULL,id TEXT NOT NULL,payload TEXT NOT NULL,PRIMARY KEY(kind,id));
         CREATE TABLE IF NOT EXISTS foods(code TEXT PRIMARY KEY, payload TEXT NOT NULL, search TEXT NOT NULL);
@@ -81,7 +82,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.43.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.44.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -96,13 +97,14 @@ def validate_finish(start,finish):
 
 class Entry(BaseModel):
     id: UUID
-    type: Literal['text','barcode','picture','item','drink','manual']
+    type: Literal['text','barcode','barcode_bls','picture','item','drink','manual']
     timestamp: datetime
     finished_at: datetime | None = None
     quantity: Quantity | None = None
     description: str | None = Field(default=None, max_length=10000)
     barcode: str | None = Field(default=None, pattern=r'^\d{8,14}$')
     manual_id: UUID | None = None
+    barcode_bls_version: int | None = Field(default=None,ge=1)
     bls_code: str | None = None
     filename: str | None = None
     capture_method: Literal['recent','favorite','json_import','recipe_import'] | None = None
@@ -118,7 +120,7 @@ class Entry(BaseModel):
         validate_finish(self.timestamp,self.finished_at)
         if self.type=='manual' and (not self.manual_id or self.bls_code):
             raise ValueError('Manual ingredient required; do not combine with BLS')
-        if self.type == 'barcode' and not self.barcode:
+        if self.type in ('barcode','barcode_bls') and not self.barcode:
             raise ValueError('barcode required')
         if self.type=='drink' and self.drink=='alcohol' and self.quantity and self.quantity.unit=='g' and self.alcohol_abv is not None:
             raise ValueError('Use grams of pure alcohol OR drink volume and ABV')
@@ -141,6 +143,8 @@ async def process(e, reuse_off=False):
     e.update(status='needs_review', reason='Food or quantity unresolved', nutrients={}, warnings=[])
     e.pop('ethanol_g',None)
     q = e.get('quantity')
+    if e['type']=='barcode_bls' and not e.get('bls_code'):
+        with db() as c:e['bls_code']=barcode_bls.lookup(c,e['barcode'],required=True)['bls_code']
     food = None
     if e.get('imported_nutrition') and not any(e.get(k) for k in ('bls_code','manual_id','barcode')):
         snapshot=e['imported_nutrition']
@@ -208,6 +212,7 @@ async def process(e, reuse_off=False):
                 food = json.loads(row['payload'])
         if food:
             e['source'] = {'provider':'BLS', 'code':food['bls_code'], 'units_version':bls_units.VERSION}
+            if e['type']=='barcode_bls':e['source']['barcode']=e['barcode']
             e['food'] = food
             raw = {k: {'value':v,'unit':BLS_UNITS.get(k)} for k,v in food['nutrients'].items()}
             basis = 'g'
@@ -258,6 +263,7 @@ async def create(entry: Entry):
     if entry.recipe_id:
         load_recipe(entry.recipe_id)
     payload=entry.model_dump(mode='json')
+    if payload.get('barcode_bls_version') is None:payload.pop('barcode_bls_version',None)
     fingerprint=hashlib.sha256(json.dumps(payload,sort_keys=True).encode()).hexdigest()
     e={**payload,'status':'unprocessed','health_status':'pending','revision':1}
     with db() as c:
@@ -266,6 +272,10 @@ async def create(entry: Entry):
             if existing['fingerprint'] != fingerprint:
                 raise HTTPException(409,'ID already used with different content')
             return json.loads(existing['payload'])
+        if entry.type=='barcode_bls':
+            link=barcode_bls.lookup(c,entry.barcode,required=True)
+            if entry.barcode_bls_version is not None and entry.barcode_bls_version!=link['version']:raise HTTPException(409,'Barcode link changed; check the linked BLS food again')
+            e['bls_code']=link['bls_code'];e['barcode_bls_mapping']={'barcode':entry.barcode,'bls_code':link['bls_code'],'version':link['version']}
         if entry.type=='manual':
             e['manual_snapshot']=manual_ingredients.load(db,entry.manual_id)
         # Preserve validated original before processing; transaction commits before network lookup.
@@ -883,3 +893,6 @@ planning.install(app,db,auth,normalize,load_recipe,recipe_details,RecipeIntake,r
 
 from . import inbox
 inbox.install(app,db,auth,Entry,process,load_recipe,recipe_details,RecipeIntake,recipe_entry,lambda:DATA)
+
+from . import barcode_bls
+barcode_bls.install(app,db,auth)

@@ -41,6 +41,6 @@ function installBarcodePicker(prefix,target,isActive){
  window.addEventListener('friss-page',cancel);
  }else $('quickForm').addEventListener('reset',cancel);
 }
-installBarcodePicker('barcode','description',()=>$('kind').value==='barcode');
+installBarcodePicker('barcode','description',()=>['barcode','barcode_bls'].includes($('kind').value));
 installBarcodePicker('quickBarcode','quickDescription',()=>$('quickType').value==='barcode');
 translate();

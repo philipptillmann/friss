@@ -1,6 +1,6 @@
 # Friss – Benutzerhandbuch
 
-**Für Version 1.43.0 · Stand: 10. November 2026**
+**Für Version 1.44.0 · Stand: 11. November 2026**
 [English manual](USER_MANUAL_EN.md) · [Projektübersicht](../README.md)
 
 Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server speichert Einträge, Originaleingaben, Rezepte und Nährwertdaten. Du bedienst Friss im Browser am Computer oder über eine Verknüpfung auf dem iPhone-Home-Bildschirm. Friss ist eine Web-App, keine native iPhone-App. Zum Schreiben in Apple Health ist ein separater iPhone-Kurzbefehl erforderlich.
@@ -27,6 +27,8 @@ Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server 
 17. [Essensplanung, Vorrat und Einkaufsliste](#17-essensplanung-vorrat-und-einkaufsliste)
 
 18. [Posteingang für unfertige Einträge](#18-posteingang-für-unfertige-einträge)
+
+19. [Barcodes mit BLS verknüpfen](#19-barcodes-mit-bls-verknüpfen)
 
 ## 1. Erste Schritte
 
@@ -335,3 +337,9 @@ Planung und Vorrat lassen sich in Einstellungen unabhängig ausschalten, ohne Da
 Im **Posteingang** Text, Bilder oder beides mit Originaldatum/-zeit speichern. Unfertige Einträge zählen nicht zu Nährwerten, Statistik, BAC oder Health. Entwurf öffnen, Originale prüfen, Lebensmittel/Rezept samt Menge und Zeitpunkt wählen und ausdrücklich zu genau einem Tagebucheintrag abschließen. Text und Fotos bleiben erhalten. Unbekannte Mengen dürfen bis später offen bleiben.
 
 Ein Kurzbefehl kann Zeit/Text/Titel per POST an `/inbox` senden und anschließend Bilddateien per PUT an `photo_upload_url` hochladen. Nährwerte, KI-Antwort und eigene UUID sind nicht nötig. Identische Wiederholungen vermeiden Duplikate. Sicherungen enthalten den Posteingang. [Vollständige deutsche/englische Anleitung und API](INBOX.md).
+
+## 19. Barcodes mit BLS verknüpfen
+
+Bei Mahlzeiten und Rezeptzutaten **Barcode → BLS** wählen. Barcode scannen/eingeben; falls unbekannt, BLS durchsuchen, Lebensmittel auswählen und zuerst verknüpfen. Künftige Scans verwenden direkt dessen BLS-Nährwerte. Menge in Gramm; die normale Barcode-Erfassung nutzt weiterhin Open Food Facts.
+
+Zuordnungen lassen sich ändern/entfernen, ohne alte Einträge zu verändern. Das BLS-Profil ist ein gewählter Ersatz, keine geprüfte Produktanalyse. [Vollständige zweisprachige Anleitung und API](BARCODE_BLS.md).

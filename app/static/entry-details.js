@@ -15,7 +15,7 @@ function renderEntryDetails(setTime=false){
  $('detailPhotos').hidden=!e.photos?.length;$('detailPhotoList').replaceChildren();
  for(const [index,photo] of (e.photos||[]).entries()){const link=document.createElement('a');link.href=photo.url;link.target='_blank';link.rel='noopener';const img=document.createElement('img');img.src=photo.url;img.alt=t('originalPhotos')+' '+(index+1);img.loading='lazy';link.append(img);$('detailPhotoList').append(link);}
  $('detailMetadata').replaceChildren();
- const method={manual:'detailManual',item:'detailSearch',picture:'detailPhoto',barcode:'entryBarcode',recipe:'detailRecipe',drink:'detailDrink',text:'detailText'}[e.type];
+ const method={manual:'detailManual',item:'detailSearch',picture:'detailPhoto',barcode:'entryBarcode',barcode_bls:'barcodeBlsMode',recipe:'detailRecipe',drink:'detailDrink',text:'detailText'}[e.type];
  detailMetadata('captureMethod',t(e.capture_method==='recipe_import'?'detailRecipeImport':e.capture_method==='json_import'?'detailJsonImport':e.capture_method==='recent'?'detailRecent':e.capture_method==='favorite'?'detailFavorite':method||e.type));
  if(e.import_context?.title)detailMetadata('jsonMealTitle',e.import_context.title);
  if(e.import_context?.notes)detailMetadata('jsonItemNotes',e.import_context.notes);

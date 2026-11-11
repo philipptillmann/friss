@@ -48,3 +48,5 @@ From v1.36.0 backups include the `food_synonyms` table. Earlier v1 ZIPs without 
 From v1.42.0 backups include `planning_records` (planning/inventory settings, recipe plans/snapshots, fridge stock, shopping items and checks). Earlier ZIPs restore this collection as empty. Restore a new backup with v1.42.0 or newer; older applications reject the added table.
 
 From v1.43.0 backups include `inbox_records` and captured original text/photos, including completed/deleted-item archive records. Earlier ZIPs restore an empty inbox. Restore new inbox archives with v1.43.0 or newer.
+
+From v1.44.0 backups include `barcode_bls_links`, including link versions and removed-link markers. Older archives restore an empty collection; restore these newer archives with v1.44.0 or later.

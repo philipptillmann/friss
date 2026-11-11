@@ -1,3 +1,10 @@
+## 1.44.0 — Barcode → BLS
+
+- #77: Add explicit Barcode → BLS capture for diary meals and recipe/drink ingredients, using the existing camera/photo scanner or manual barcode input.
+- Prompt to select and persist a BLS link when unknown; reuse linked BLS nutrition directly without Open Food Facts. Allow confirmed replacement/removal for future entries while preserving old entries and recipe snapshots.
+- Add authenticated, versioned barcode-link APIs; reject missing/stale links before entry creation, preserve barcode provenance, and include links in backups with legacy archive compatibility.
+- Document the new flow/API in English and German and update manuals.
+
 ## 1.43.0 — Unfinished text/photo inbox
 
 - #90: Add a dedicated de/en Inbox page for timestamped text, pictures or both, sorted by capture time and separate from diary/nutrient/Health totals.

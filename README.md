@@ -1,11 +1,11 @@
-# Friss · Version 1.43.0
+# Friss · Version 1.44.0
 
 Self-hosted food and drink tracking for Debian/Docker, web browsers and iPhone Shortcuts. Includes BLS/Open Food Facts search, recipes, manual foods, statistics, JSON imports, backups and Apple Health export preparation.
 
 ## User manuals / Benutzerhandbücher
 
-- **[English user manual — current version 1.43.0](docs/USER_MANUAL_EN.md)**
-- **[Deutsches Benutzerhandbuch — aktuelle Version 1.43.0](docs/USER_MANUAL_DE.md)**
+- **[English user manual — current version 1.44.0](docs/USER_MANUAL_EN.md)**
+- **[Deutsches Benutzerhandbuch — aktuelle Version 1.44.0](docs/USER_MANUAL_DE.md)**
 
 The manuals describe current workflows. The sections below also preserve historical release notes and API setup examples; use the manuals when older instructions differ.
 Die Handbücher beschreiben die aktuellen Abläufe. Die folgenden Abschnitte enthalten auch historische Versionshinweise und API-Beispiele; bei abweichenden älteren Angaben gelten die Handbücher.
@@ -510,3 +510,7 @@ Plan saved recipes without logging consumption; explicitly mark eaten when consu
 ### Unfinished-entry inbox / Posteingang (v1.43.0)
 
 Capture timestamped text/photos separately from the diary, then complete into a selected food/recipe when ready. Includes a dedicated page and Shortcut APIs with server-generated IDs, safe retries and original-photo retention. [English/German user and API guide](docs/INBOX.md).
+
+### Barcode → BLS (v1.44.0)
+
+Separate meal/recipe capture mode: scan a barcode, choose a BLS food once, then reuse that link and BLS nutrients on future scans. The regular OFF barcode option remains available. Links are versioned, backed up and affect future entries only. [English/German instructions and API](docs/BARCODE_BLS.md).
