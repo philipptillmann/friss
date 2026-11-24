@@ -1,3 +1,10 @@
+## 1.45.0 — Rezepte als Zutaten
+
+- #91: Lebensmittel-/Getränkerezepte als Zutaten anderer Rezepte über Suche oder Rezeptauswahl hinzufügen; Portionen/Anteile ohne Gewicht, Gramm/ml mit fertigem Gewicht/Volumen unterstützen.
+- Unterrezept-Momentaufnahmen erhalten, direkte/indirekte Selbstverweise und mehr als acht Stufen ablehnen. Zutaten bleiben außerhalb von Tagebuch und Health; vorhandene Detailansicht bearbeitet ihre Menge.
+- Wasser, Koffein und Alkohol anteilig übernehmen; Einkaufsliste rekursiv auf Lebensmittel auflösen und explizite manuelle Lebensmittelkorrekturen durch verschachtelte Momentaufnahmen führen.
+- Authentifizierte, wiederholungssichere Zutaten-API und zweisprachige Dokumentation ergänzen. Bestehende Backups enthalten alle Daten ohne Schemaänderung.
+
 ## 1.44.0 — Barcode → BLS
 
 - #77: Add explicit Barcode → BLS capture for diary meals and recipe/drink ingredients, using the existing camera/photo scanner or manual barcode input.

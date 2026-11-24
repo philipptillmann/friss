@@ -94,19 +94,25 @@ def install(app,db,auth,normalize,load_recipe,details,RecipeIntake,recipe_entry,
     def shopping(c,start,end):
         if end<start or (end-start).days>365:raise HTTPException(422,'Select a range up to 366 days')
         cfg=settings(c);required={};warnings=[]
+        def collect(r,scale,name,depth=0):
+            if depth>8:raise HTTPException(422,'Recipe nesting too deep')
+            for e in r.get('raw_ingredients',r.get('ingredients',[])):
+                q=e.get('quantity')
+                if not q:
+                    warnings.append(name+': ingredient quantity unknown');continue
+                if e.get('recipe_snapshot'):
+                    child=e['recipe_snapshot']
+                    collect(child,scale*factor({'unit':q['unit'],'amount':q['value']},child),child.get('name',name),depth+1)
+                    continue
+                source,ref=identity(e);key=(source,ref,q['unit'])
+                label=(e.get('food') or {}).get('name_de') or (e.get('food') or {}).get('product_name') or e.get('description') or ref
+                required.setdefault(key,{'name':label,'source':source,'source_id':ref,'unit':q['unit'],'required':0})['required']+=q['value']*scale
+            if r.get('added_water_ml'):warnings.append(name+': extra water is not added to shopping')
+            if r.get('added_caffeine_mg') or r.get('added_ethanol_g'):warnings.append(name+': pure caffeine/alcohol additions need manual shopping items')
         if cfg['planning_enabled']:
             for p in rows(c,'plan'):
                 if p.get('entry_id') or not start.isoformat()<=p['day']<=end.isoformat():continue
-                r=p['snapshot'];scale=factor(p,r)
-                for e in r['raw_ingredients']:
-                    q=e.get('quantity')
-                    if not q:
-                        warnings.append(p['name']+': ingredient quantity unknown');continue
-                    source,ref=identity(e);key=(source,ref,q['unit'])
-                    name=(e.get('food') or {}).get('name_de') or (e.get('food') or {}).get('product_name') or e.get('description') or ref
-                    required.setdefault(key,{'name':name,'source':source,'source_id':ref,'unit':q['unit'],'required':0})['required']+=q['value']*scale
-                if r.get('added_water_ml'):warnings.append(p['name']+': extra water is not added to shopping')
-                if r.get('added_caffeine_mg') or r.get('added_ethanol_g'):warnings.append(p['name']+': pure caffeine/alcohol additions need manual shopping items')
+                r=p['snapshot'];collect(r,factor(p,r),p['name'])
         available={}
         if cfg['inventory_enabled']:
             for s in rows(c,'stock'):

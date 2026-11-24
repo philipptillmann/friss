@@ -1,6 +1,6 @@
 # Friss user manual
 
-**For version 1.44.0 · Updated 11 November 2026**
+**For version 1.45.0 · Updated 24 November 2026**
 [Deutsches Handbuch](USER_MANUAL_DE.md) · [Project overview](../README.md)
 
 Friss is a self-hosted food and drink diary. Your server stores entries, original inputs, recipes and nutrient data. You can use the browser on a computer or add the site to your iPhone Home Screen. It is a web app, not a native iPhone app. Apple Health writes require a separate iPhone Shortcut.
@@ -29,6 +29,8 @@ Friss is a self-hosted food and drink diary. Your server stores entries, origina
 18. [Unfinished-entry inbox](#18-unfinished-entry-inbox)
 
 19. [Link barcodes to BLS](#19-link-barcodes-to-bls)
+
+20. [Recipes as ingredients](#20-recipes-as-ingredients)
 
 ## 1. Getting started
 
@@ -343,3 +345,9 @@ A Shortcut can POST timestamp/text/title to `/inbox`, then PUT picture files to 
 Choose **Barcode → BLS** when entering a meal or recipe ingredient. Scan/type the barcode; if unknown, search BLS, select a food and save the link first. Future scans use its BLS nutrients directly. Enter grams; normal Barcode still uses Open Food Facts.
 
 Links can be changed/removed without altering existing entries. The chosen BLS profile is a substitute, not verified product data. [Complete bilingual guide and API](BARCODE_BLS.md).
+
+## 20. Recipes as ingredients
+
+Saved recipes/drinks can be ingredients of other recipes. In the parent recipe, search for the child or select Recipe/Drink as ingredient. Portions and fractions do not need a weight; grams require the child's finished weight, ml its volume. Only consuming the parent adds diary intake.
+
+Child versions stay frozen. Edit amount in ingredient details, or remove/re-add to refresh the child or change units. Cycles are rejected; up to eight recipe levels are supported. Shopping expands to base foods. [Full guide and API](NESTED_RECIPES.md).

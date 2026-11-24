@@ -82,7 +82,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.44.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.45.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -669,6 +669,7 @@ def recipe_details(recipe,ingredients=None):
         n=ingredient.get('nutrients',{}).get('dietaryCaffeine')
         if n and n['unit'] in mass: caffeine+=n['value']*mass[n['unit']]*1000
         if ingredient.get('drink')=='water': water+=ingredient.get('nutrients',{}).get('dietaryWater',{}).get('value',0)
+        else:water+=ingredient.get('drinking_water_ml',0)
     if recipe.get('alcohol_abv') is not None:ethanol=recipe['finished_volume_ml']*recipe['alcohol_abv']/100*.789
     if caffeine: totals['dietaryCaffeine']={'value':caffeine,'unit':'mg'}
     if water: totals['dietaryWater']={'value':water,'unit':'ml'}
@@ -896,3 +897,6 @@ inbox.install(app,db,auth,Entry,process,load_recipe,recipe_details,RecipeIntake,
 
 from . import barcode_bls
 barcode_bls.install(app,db,auth)
+
+from . import nested_recipes
+nested_recipes.install(app,db,auth,RecipeIntake,load_recipe,recipe_details,recipe_entry,lambda:DATA)

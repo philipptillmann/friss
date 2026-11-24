@@ -17,6 +17,7 @@ Object.assign(words.en,{unifiedSearch:'Search foods and recipes',unifiedLoading:
  }
  function show(results,query,language){
   if(editing)results=results.filter(r=>r.source==='bls');
+  if(recipePage())results=results.filter(r=>r.source!=='recipe'||r.id!==activeRecipe);
   shown=results;highlight=-1;$('results').replaceChildren();
   for(const result of results){const button=document.createElement('button');button.type='button';button.className='result';button.setAttribute('role','option');button.setAttribute('aria-selected','false');
    const source=sourceBadge(result.source,result.category);
@@ -29,7 +30,7 @@ Object.assign(words.en,{unifiedSearch:'Search foods and recipes',unifiedLoading:
  $('search').oninput=()=>{
   invalidate();reusedVia=null;selected=null;kindChange(false);$('selected').textContent='';$('results').replaceChildren();
   const mine=sequence,query=$('search').value.trim(),language=lang;if(!query)return;
-  const context='&include_recipes='+(!recipePage()&&!editing);
+  const context='&include_recipes='+(!editing);
   let remoteDone=false;
   const valid=()=>mine===sequence&&language===lang&&!$('dashboard').hidden&&$('kind').value==='item';
   api('/search?q='+encodeURIComponent(query)+'&lang='+language+'&remote=false'+context).then(data=>{if(valid()&&!remoteDone)show(data.results,query,language);}).catch(e=>{if(valid()&&!remoteDone)message(e.message,true);});

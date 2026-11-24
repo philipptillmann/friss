@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');const elements=new Map();
 const $=id=>{if(!elements.has(id))elements.set(id,{value:'',textContent:'',children:[],append(...n){this.children.push(...n)},replaceChildren(...n){this.children=n}});return elements.get(id)};
-const context=vm.createContext({$,selected:null,document:{createElement:()=>({})},recipeRows:[{id:'food',name:'Fondue'},{id:'drink',name:'Coffee',category:'drink'}],t:k=>k});
+const context=vm.createContext({$,selected:null,recipePage:()=>false,activeRecipe:"",document:{createElement:()=>({})},recipeRows:[{id:'food',name:'Fondue'},{id:'drink',name:'Coffee',category:'drink'}],t:k=>k});
 const s=fs.readFileSync('app/static/app.js','utf8');vm.runInContext(s.slice(s.indexOf('function intakeCategory(){'),s.indexOf('function renderRecipes(){')),context);
 $('kind').value='recipe';vm.runInContext('renderMealRecipeChoices()',context);assert.deepEqual($('mealRecipe').children.map(o=>o.value),['','food']);
 $('mealRecipe').value='food';$('kind').value='drink_recipe';vm.runInContext('renderMealRecipeChoices()',context);assert.deepEqual($('mealRecipe').children.map(o=>o.value),['','drink']);assert.equal($('mealRecipe').value,'');assert.equal($('mealRecipeLabel').textContent,'chooseDrink');
@@ -8,3 +8,5 @@ $('kind').value='item';context.selected={source:'recipe',category:'drink'};vm.ru
 $('mealRecipe').value='drink';$('kind').value='recipe';vm.runInContext('renderMealRecipeChoices()',context);assert.equal($('mealRecipe').value,'');
 const html=fs.readFileSync('app/static/index.html','utf8'),kind=html.slice(html.indexOf('<select id="kind">'),html.indexOf('</select>',html.indexOf('<select id="kind">')));assert.equal(kind.includes('value="off"'),false);assert.ok(kind.includes('value="drink_recipe"'));
 console.log('Intake selectors: food and drink lists separated, stale selection cleared, legacy OFF option removed');
+
+context.recipePage=()=>true;context.activeRecipe="food";$("kind").value="recipe";vm.runInContext("renderMealRecipeChoices()",context);assert.deepEqual($("mealRecipe").children.map(o=>o.value),[""]);

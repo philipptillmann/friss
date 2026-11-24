@@ -1,6 +1,6 @@
 # Friss – Benutzerhandbuch
 
-**Für Version 1.44.0 · Stand: 11. November 2026**
+**Für Version 1.45.0 · Stand: 24. November 2026**
 [English manual](USER_MANUAL_EN.md) · [Projektübersicht](../README.md)
 
 Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server speichert Einträge, Originaleingaben, Rezepte und Nährwertdaten. Du bedienst Friss im Browser am Computer oder über eine Verknüpfung auf dem iPhone-Home-Bildschirm. Friss ist eine Web-App, keine native iPhone-App. Zum Schreiben in Apple Health ist ein separater iPhone-Kurzbefehl erforderlich.
@@ -29,6 +29,8 @@ Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server 
 18. [Posteingang für unfertige Einträge](#18-posteingang-für-unfertige-einträge)
 
 19. [Barcodes mit BLS verknüpfen](#19-barcodes-mit-bls-verknüpfen)
+
+20. [Rezepte als Zutaten](#20-rezepte-als-zutaten)
 
 ## 1. Erste Schritte
 
@@ -343,3 +345,9 @@ Ein Kurzbefehl kann Zeit/Text/Titel per POST an `/inbox` senden und anschließen
 Bei Mahlzeiten und Rezeptzutaten **Barcode → BLS** wählen. Barcode scannen/eingeben; falls unbekannt, BLS durchsuchen, Lebensmittel auswählen und zuerst verknüpfen. Künftige Scans verwenden direkt dessen BLS-Nährwerte. Menge in Gramm; die normale Barcode-Erfassung nutzt weiterhin Open Food Facts.
 
 Zuordnungen lassen sich ändern/entfernen, ohne alte Einträge zu verändern. Das BLS-Profil ist ein gewählter Ersatz, keine geprüfte Produktanalyse. [Vollständige zweisprachige Anleitung und API](BARCODE_BLS.md).
+
+## 20. Rezepte als Zutaten
+
+Gespeicherte Rezepte/Getränke können Zutaten anderer Rezepte sein. Im übergeordneten Rezept Unterrezept suchen oder Rezept/Getränk als Zutat auswählen. Portionen und Anteile benötigen kein Gewicht; Gramm das fertige Unterrezeptgewicht, ml dessen Volumen. Erst Verzehr des übergeordneten Rezepts zählt zum Tagebuch.
+
+Unterrezeptstände bleiben eingefroren. Menge in den Zutatendetails ändern; für aktuellen Rezeptstand oder andere Einheit entfernen und neu hinzufügen. Kreise sind ausgeschlossen, bis zu acht Rezeptstufen möglich. Einkaufen löst die Zutaten rekursiv auf. [Vollständige Anleitung und API](NESTED_RECIPES.md).
