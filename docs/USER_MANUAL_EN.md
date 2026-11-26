@@ -1,6 +1,6 @@
 # Friss user manual
 
-**For version 1.45.0 · Updated 24 November 2026**
+**For version 1.46.0 · Updated 26 November 2026**
 [Deutsches Handbuch](USER_MANUAL_DE.md) · [Project overview](../README.md)
 
 Friss is a self-hosted food and drink diary. Your server stores entries, original inputs, recipes and nutrient data. You can use the browser on a computer or add the site to your iPhone Home Screen. It is a web app, not a native iPhone app. Apple Health writes require a separate iPhone Shortcut.
@@ -31,6 +31,8 @@ Friss is a self-hosted food and drink diary. Your server stores entries, origina
 19. [Link barcodes to BLS](#19-link-barcodes-to-bls)
 
 20. [Recipes as ingredients](#20-recipes-as-ingredients)
+
+21. [Refresh empty Open Food Facts nutrition](#21-refresh-empty-open-food-facts-nutrition)
 
 ## 1. Getting started
 
@@ -351,3 +353,9 @@ Links can be changed/removed without altering existing entries. The chosen BLS p
 Saved recipes/drinks can be ingredients of other recipes. In the parent recipe, search for the child or select Recipe/Drink as ingredient. Portions and fractions do not need a weight; grams require the child's finished weight, ml its volume. Only consuming the parent adds diary intake.
 
 Child versions stay frozen. Edit amount in ingredient details, or remove/re-add to refresh the child or change units. Cycles are rejected; up to eight recipe levels are supported. Shopping expands to base foods. [Full guide and API](NESTED_RECIPES.md).
+
+## 21. Refresh empty Open Food Facts nutrition
+
+A red **!** beside the Open Food Facts tag means its original nutritional profile has no positive values (missing/all zero). Tap and confirm to refresh after fixing the product on Open Food Facts. Any direct OFF entry also has a **Refresh from Open Food Facts** button in details.
+
+Only the selected entry/ingredient is recalculated at its saved amount/time. Failed fetches preserve old values; prior revisions are archived. Existing recipe consumption snapshots and Health samples are not rewritten. [Full guide and API](OFF_REFRESH.md).

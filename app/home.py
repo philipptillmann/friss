@@ -1,5 +1,5 @@
 """Persisted Home preferences, button images, and daily nutrient summaries."""
-from . import bls_units, alcohol, nutrient_policy
+from . import bls_units, alcohol, nutrient_policy, off_refresh
 import io
 import json
 import math
@@ -129,6 +129,7 @@ def food_water_values(e, missing_as_zero=False):
 
 
 def interpreted_entry(e,missing_as_zero=False):
+    e=off_refresh.annotate(e)
     if not missing_as_zero or not nutrient_policy.ready(e):return e
     values=nutrient_values(e,True)
     nutrients={k:v for k,v in values.items() if v.get('value') is not None and v.get('unit')}

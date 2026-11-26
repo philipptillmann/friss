@@ -7,7 +7,7 @@ Object.assign(words.de,{copyEntry:'Eintrag kopieren',copyEntryTime:'Neuer Zeitpu
 Object.assign(words.en,{copyEntry:'Copy entry',copyEntryTime:'New date and time',copyEntryHint:'Creates a new diary entry with the same amount and nutritional values. Health export starts afresh.',copyEntryRetry:'Transfer uncertain. Copy again to retry the same request without duplicates.',copyEntrySource:'Copied from'});
 let detailedEntry=null,detailGeneration=0,detailCopyAttempt=null,detailCopyBusy=false;
 function detailEntryId(){return location.hash.startsWith('#entry/')?location.hash.slice(7):null;}
-function detailMetadata(label,value){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=t(label);dd.textContent=value;$('detailMetadata').append(dt,dd);}
+function detailMetadata(label,value){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=t(label);dd.textContent=value;$('detailMetadata').append(dt,dd);return dd;}
 function renderEntryDetails(setTime=false){
  const e=detailedEntry;if(!e)return;
  $('detailResolve').hidden=e.status==='processed'||e.health_status!=='pending'||e.type==='recipe';
@@ -29,7 +29,7 @@ function renderEntryDetails(setTime=false){
  $('detailNutrientsTitle').textContent=t(e.recipe_id?'ingredientNutrients':'entryNutrients');
  if(e.import_context?.original_message)detailMetadata('detailOriginalMessage',e.import_context.original_message);
  detailMetadata('entryStatus',t(e.status));
- if(e.source?.provider)detailMetadata('dataSource',e.source.provider);
+ if(e.source?.provider){const dd=detailMetadata('dataSource',e.source.provider);dd.replaceChildren(entrySourceBadge(e));if(typeof offWarningButton==='function'){const warning=offWarningButton(e);if(warning)dd.append(warning);}}
  if(e.copied_from)detailMetadata('copyEntrySource',new Date(e.copied_from.timestamp).toLocaleString(lang));
  if(e.barcode)detailMetadata('entryBarcode',e.barcode);
  detailMetadata('entryId',e.id);

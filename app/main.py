@@ -82,7 +82,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.45.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.46.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -900,3 +900,6 @@ barcode_bls.install(app,db,auth)
 
 from . import nested_recipes
 nested_recipes.install(app,db,auth,RecipeIntake,load_recipe,recipe_details,recipe_entry,lambda:DATA)
+
+from . import off_refresh
+off_refresh.install(app,db,auth,load_entry,process,lambda:DATA)

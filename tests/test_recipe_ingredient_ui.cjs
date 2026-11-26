@@ -10,6 +10,6 @@ vm.runInContext(sharedSource.slice(sharedSource.indexOf('// Shared source badges
 vm.runInContext(source.slice(source.indexOf('function render(){'),source.indexOf('\n',source.indexOf('function render(){'))),context);
 vm.runInContext(source.slice(source.indexOf('function resumeEntry(e){'),source.indexOf("$('alcoholEntryMode').onchange")),context);
 vm.runInContext('render()',context);
-const link=$('entries').children[0].children[0];assert.equal(link.tag,'a');assert.equal(link.href,'#entry/ingredient');
-assert.equal(link.children.some(n=>n.textContent==='pending'),false,'recipe ingredients must not show Health pending');
+const body=$('entries').children[0].children[0],link=body.children[0];assert.equal(body.tag,'div');assert.equal(link.tag,'a');assert.equal(link.href,'#entry/ingredient');
+assert.equal(body.children.some(n=>n.textContent==='pending'),false,'recipe ingredients must not show Health pending');
 console.log('Recipe ingredient UI: opens shared entry details without Health status');

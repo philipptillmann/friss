@@ -1,6 +1,6 @@
 # Friss – Benutzerhandbuch
 
-**Für Version 1.45.0 · Stand: 24. November 2026**
+**Für Version 1.46.0 · Stand: 26. November 2026**
 [English manual](USER_MANUAL_EN.md) · [Projektübersicht](../README.md)
 
 Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server speichert Einträge, Originaleingaben, Rezepte und Nährwertdaten. Du bedienst Friss im Browser am Computer oder über eine Verknüpfung auf dem iPhone-Home-Bildschirm. Friss ist eine Web-App, keine native iPhone-App. Zum Schreiben in Apple Health ist ein separater iPhone-Kurzbefehl erforderlich.
@@ -31,6 +31,8 @@ Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server 
 19. [Barcodes mit BLS verknüpfen](#19-barcodes-mit-bls-verknüpfen)
 
 20. [Rezepte als Zutaten](#20-rezepte-als-zutaten)
+
+21. [Leere Open-Food-Facts-Nährwerte aktualisieren](#21-leere-open-food-facts-nährwerte-aktualisieren)
 
 ## 1. Erste Schritte
 
@@ -351,3 +353,9 @@ Zuordnungen lassen sich ändern/entfernen, ohne alte Einträge zu verändern. Da
 Gespeicherte Rezepte/Getränke können Zutaten anderer Rezepte sein. Im übergeordneten Rezept Unterrezept suchen oder Rezept/Getränk als Zutat auswählen. Portionen und Anteile benötigen kein Gewicht; Gramm das fertige Unterrezeptgewicht, ml dessen Volumen. Erst Verzehr des übergeordneten Rezepts zählt zum Tagebuch.
 
 Unterrezeptstände bleiben eingefroren. Menge in den Zutatendetails ändern; für aktuellen Rezeptstand oder andere Einheit entfernen und neu hinzufügen. Kreise sind ausgeschlossen, bis zu acht Rezeptstufen möglich. Einkaufen löst die Zutaten rekursiv auf. [Vollständige Anleitung und API](NESTED_RECIPES.md).
+
+## 21. Leere Open-Food-Facts-Nährwerte aktualisieren
+
+Ein rotes **!** hinter Open Food Facts bedeutet, dass das Originalprofil keine positiven Nährwerte enthält (fehlend/alle null). Nach Ergänzung bei Open Food Facts antippen und Aktualisierung bestätigen. Jeder direkte OFF-Eintrag hat außerdem **Aus Open Food Facts aktualisieren** in den Details.
+
+Nur der gewählte Eintrag/die Zutat wird mit gespeicherter Menge/Zeit neu berechnet. Abruffehler erhalten alte Daten; frühere Stände werden archiviert. Gebuchte Rezeptmomentaufnahmen und Health-Werte werden nicht überschrieben. [Vollständige Anleitung und API](OFF_REFRESH.md).

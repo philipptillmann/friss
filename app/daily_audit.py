@@ -3,7 +3,7 @@ import json
 from datetime import date,datetime,time,timedelta
 from zoneinfo import ZoneInfo,ZoneInfoNotFoundError
 from fastapi import Depends,HTTPException,Query
-from . import home,nutrient_policy,bls_units
+from . import home,nutrient_policy,bls_units,off_refresh
 from .statistics import METRICS
 
 
@@ -49,7 +49,7 @@ def build(records,day,zone,missing_as_zero=False):
             for key,n in cells.items():
                 if n['status']=='known':cells[key]={**n,'value':values[key]['value'],'unit':values[key].get('unit'),'status':'unverified'}
         food=e.get('food') or {};snapshot=e.get('recipe_snapshot') or {}
-        rows.append({'id':e['id'],'timestamp':e['timestamp'],'quantity':e.get('quantity'),'status':e['status'],'health_status':e['health_status'],'type':e['type'],'manual_id':e.get('manual_id'),'bls_code':e.get('bls_code') or food.get('bls_code'),'barcode':e.get('barcode'),'source':e.get('source'),'recipe_snapshot':{'id':snapshot.get('id'),'category':snapshot.get('category','food')} if snapshot else None,'imported_nutrition':{'estimated':True} if e.get('imported_nutrition') else None,'name_de':food.get('name_de') or food.get('product_name') or e.get('description') or e.get('barcode') or e.get('drink') or e['type'],'name_en':food.get('name_en') or food.get('product_name') or e.get('description') or e.get('barcode') or e.get('drink') or e['type'],'cells':cells,'incomplete':sum(n['status']!='known' or n['assumed'] for n in cells.values())})
+        rows.append({'id':e['id'],'revision':e.get('revision',1),'off_nutrition_empty':off_refresh.empty(e),'timestamp':e['timestamp'],'quantity':e.get('quantity'),'status':e['status'],'health_status':e['health_status'],'type':e['type'],'manual_id':e.get('manual_id'),'bls_code':e.get('bls_code') or food.get('bls_code'),'barcode':e.get('barcode'),'source':e.get('source'),'recipe_snapshot':{'id':snapshot.get('id'),'category':snapshot.get('category','food')} if snapshot else None,'imported_nutrition':{'estimated':True} if e.get('imported_nutrition') else None,'name_de':food.get('name_de') or food.get('product_name') or e.get('description') or e.get('barcode') or e.get('drink') or e['type'],'name_en':food.get('name_en') or food.get('product_name') or e.get('description') or e.get('barcode') or e.get('drink') or e['type'],'cells':cells,'incomplete':sum(n['status']!='known' or n['assumed'] for n in cells.values())})
     totals={}
     for key,unit in units.items():
         known=[r['cells'][key]['value'] for r in rows if r['cells'][key]['status']=='known' and not r['cells'][key]['assumed']]

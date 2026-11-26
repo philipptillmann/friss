@@ -1,3 +1,9 @@
+## 1.46.0 — Open Food Facts warning and refresh
+
+- #92: Mark missing/all-zero original OFF nutrition with a red exclamation beside source labels in meal/ingredient lists, details and daily audit; distinguish true positive nutrients from rounded/assumed zeros and metadata scores.
+- Confirm refresh from the warning, or use a details refresh button for any direct OFF entry. Fetch product again and recalculate only that entry while retaining amount/time, originals/photos and Health provenance.
+- Archive changed revisions; leave saved values unchanged on remote errors, reject concurrent changes/active exports, and preserve logged recipe snapshots. Document English/German behavior and API.
+
 ## 1.45.0 — Rezepte als Zutaten
 
 - #91: Lebensmittel-/Getränkerezepte als Zutaten anderer Rezepte über Suche oder Rezeptauswahl hinzufügen; Portionen/Anteile ohne Gewicht, Gramm/ml mit fertigem Gewicht/Volumen unterstützen.
