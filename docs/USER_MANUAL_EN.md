@@ -1,6 +1,6 @@
 # Friss user manual
 
-**For version 1.46.0 · Updated 26 November 2026**
+**For version 1.46.1 · Updated 26 November 2026**
 [Deutsches Handbuch](USER_MANUAL_DE.md) · [Project overview](../README.md)
 
 Friss is a self-hosted food and drink diary. Your server stores entries, original inputs, recipes and nutrient data. You can use the browser on a computer or add the site to your iPhone Home Screen. It is a web app, not a native iPhone app. Apple Health writes require a separate iPhone Shortcut.
@@ -33,6 +33,8 @@ Friss is a self-hosted food and drink diary. Your server stores entries, origina
 20. [Recipes as ingredients](#20-recipes-as-ingredients)
 
 21. [Refresh empty Open Food Facts nutrition](#21-refresh-empty-open-food-facts-nutrition)
+
+22. [Open Food Facts vitamins and minerals](#22-open-food-facts-vitamins-and-minerals)
 
 ## 1. Getting started
 
@@ -359,3 +361,9 @@ Child versions stay frozen. Edit amount in ingredient details, or remove/re-add 
 A red **!** beside the Open Food Facts tag means its original nutritional profile has no positive values (missing/all zero). Tap and confirm to refresh after fixing the product on Open Food Facts. Any direct OFF entry also has a **Refresh from Open Food Facts** button in details.
 
 Only the selected entry/ingredient is recalculated at its saved amount/time. Failed fetches preserve old values; prior revisions are archived. Existing recipe consumption snapshots and Health samples are not rewritten. [Full guide and API](OFF_REFRESH.md).
+
+## 22. Open Food Facts vitamins and minerals
+
+OFF imports include supported vitamins, minerals, cholesterol and unsaturated fats when present. Existing entries can gain them through **Refresh from Open Food Facts** in details; new entries use the expanded mapping automatically. Old snapshots do not silently change when viewed.
+
+Values use the source per-100-g basis and consumed gram weight. Do not assume supplement quantities are per tablet. [Full bilingual explanation and example product](OFF_MICRONUTRIENTS.md).

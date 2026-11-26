@@ -5,6 +5,7 @@ import math
 from uuid import UUID
 from fastapi import Depends,HTTPException
 from pydantic import BaseModel,Field
+from . import nutrient_policy
 
 # Actual nutrient fields only: nutrition scores and other product metadata must
 # not hide an otherwise empty nutrition profile. Check original per-100g data.
@@ -16,7 +17,7 @@ def empty(e):
     if not is_off(e):return False
     raw=(e.get('food') or {}).get('nutriments') or {}
     if not isinstance(raw,dict):return True
-    for key in NUTRIENTS:
+    for key in NUTRIENTS|set(nutrient_policy.OFF_MAP):
         value=raw.get(key+'_100g')
         if isinstance(value,bool) or value is None:continue
         try:number=float(value)

@@ -79,8 +79,9 @@ def nutrient_values(e,missing_as_zero=False):
                 else: values[key]={'value':None,'unit':bls_units.UNITS.get(key),'qualifier':raw}
     if e.get('source',{}).get('provider')=='Open Food Facts' and (e.get('quantity') or {}).get('unit')=='g':
         raw=(e.get('food') or {}).get('nutriments',{})
-        for source,(key,unit) in nutrient_policy.OFF_MAP.items():
-            value=raw.get(source+'_100g')
+        extended=e.get('source',{}).get('nutrients_version')==nutrient_policy.OFF_NUTRIENTS_VERSION
+        for key,n in nutrient_policy.off_nutrients(raw,extended=extended).items():
+            value=n['value'];unit=n['unit']
             if key not in values and value is not None:
                 if bls_units.numeric(value):values[key]={'value':value*e['quantity']['value']/100,'unit':unit}
                 else:values[key]={'value':None,'unit':unit,'qualifier':value}

@@ -82,7 +82,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.46.0', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.46.1', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -230,8 +230,8 @@ async def process(e, reuse_off=False):
                     return
                 food = product['product']
             e['food'] = food
-            e['source'] = {'provider':'Open Food Facts','code':e['barcode']}
-            raw = {target:{'value':food.get('nutriments',{}).get(key+'_100g'), 'unit':unit} for key,(target,unit) in OFF_MAP.items()}
+            e['source'] = {'provider':'Open Food Facts','code':e['barcode'],'nutrients_version':nutrient_policy.OFF_NUTRIENTS_VERSION}
+            raw = nutrient_policy.off_nutrients(food.get('nutriments',{}))
             basis = 'g'
         except (httpx.HTTPError, ValueError, KeyError):
             e.update(status='failed', reason='Open Food Facts unavailable or invalid response')

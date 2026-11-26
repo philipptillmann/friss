@@ -1,3 +1,10 @@
+## 1.46.1 — Import OFF vitamins and minerals
+
+- #93: Extend Open Food Facts mapping to supported micronutrients, unsaturated fats, cholesterol and food water. Correct the omission reported for supplement 4316268448871.
+- Read normalized per-100g gram values, convert small nutrient masses to mg/µg without reapplying label-input units, and select folate variants without double counting. Preserve missing/zero data and existing amount scaling.
+- Share interpretation between processing and source completeness; version new OFF snapshots so old entries/Health history stay unchanged until explicit refresh. New barcode entries and refresh use the expanded mapping.
+- Add the real product response fixture, unit/scaling/legacy/recipe regression coverage and bilingual instructions.
+
 ## 1.46.0 — Open Food Facts warning and refresh
 
 - #92: Mark missing/all-zero original OFF nutrition with a red exclamation beside source labels in meal/ingredient lists, details and daily audit; distinguish true positive nutrients from rounded/assumed zeros and metadata scores.

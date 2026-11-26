@@ -1,6 +1,6 @@
 # Friss – Benutzerhandbuch
 
-**Für Version 1.46.0 · Stand: 26. November 2026**
+**Für Version 1.46.1 · Stand: 26. November 2026**
 [English manual](USER_MANUAL_EN.md) · [Projektübersicht](../README.md)
 
 Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server speichert Einträge, Originaleingaben, Rezepte und Nährwertdaten. Du bedienst Friss im Browser am Computer oder über eine Verknüpfung auf dem iPhone-Home-Bildschirm. Friss ist eine Web-App, keine native iPhone-App. Zum Schreiben in Apple Health ist ein separater iPhone-Kurzbefehl erforderlich.
@@ -33,6 +33,8 @@ Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server 
 20. [Rezepte als Zutaten](#20-rezepte-als-zutaten)
 
 21. [Leere Open-Food-Facts-Nährwerte aktualisieren](#21-leere-open-food-facts-nährwerte-aktualisieren)
+
+22. [Open-Food-Facts-Vitamine und Mineralstoffe](#22-open-food-facts-vitamine-und-mineralstoffe)
 
 ## 1. Erste Schritte
 
@@ -359,3 +361,9 @@ Unterrezeptstände bleiben eingefroren. Menge in den Zutatendetails ändern; fü
 Ein rotes **!** hinter Open Food Facts bedeutet, dass das Originalprofil keine positiven Nährwerte enthält (fehlend/alle null). Nach Ergänzung bei Open Food Facts antippen und Aktualisierung bestätigen. Jeder direkte OFF-Eintrag hat außerdem **Aus Open Food Facts aktualisieren** in den Details.
 
 Nur der gewählte Eintrag/die Zutat wird mit gespeicherter Menge/Zeit neu berechnet. Abruffehler erhalten alte Daten; frühere Stände werden archiviert. Gebuchte Rezeptmomentaufnahmen und Health-Werte werden nicht überschrieben. [Vollständige Anleitung und API](OFF_REFRESH.md).
+
+## 22. Open-Food-Facts-Vitamine und Mineralstoffe
+
+OFF-Importe enthalten vorhandene unterstützte Vitamine, Mineralstoffe, Cholesterin und ungesättigte Fette. Bestehende Einträge über **Aus Open Food Facts aktualisieren** in den Details ergänzen; neue Einträge verwenden die erweiterte Zuordnung automatisch. Alte Momentaufnahmen ändern sich nicht still beim Anzeigen.
+
+Es gelten die Quellenbasis pro 100 g und die verzehrte Grammmenge. Bei Supplementen nicht pauschal Werte pro Tablette annehmen. [Zweisprachige Erklärung und Produktbeispiel](OFF_MICRONUTRIENTS.md).
