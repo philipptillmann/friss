@@ -82,7 +82,7 @@ async def auth(request: Request, credentials: HTTPAuthorizationCredentials | Non
         return
     raise HTTPException(401, 'Login required')
 
-app = FastAPI(title='Friss', version='1.46.1', lifespan=lifespan)
+app = FastAPI(title='Friss', version='1.47.0', lifespan=lifespan)
 
 BLS_UNITS = bls_units.UNITS
 OFF_MAP = nutrient_policy.OFF_MAP
@@ -139,12 +139,15 @@ def save_entry(e):
     with db() as c:
         c.execute('UPDATE entries SET payload=? WHERE id=?', (json.dumps(e), e['id']))
 
-async def process(e, reuse_off=False):
+async def process(e, reuse_off=False, prefer_manual=True):
     e.update(status='needs_review', reason='Food or quantity unresolved', nutrients={}, warnings=[])
     e.pop('ethanol_g',None)
     q = e.get('quantity')
     if e['type']=='barcode_bls' and not e.get('bls_code'):
         with db() as c:e['bls_code']=barcode_bls.lookup(c,e['barcode'],required=True)['bls_code']
+    if prefer_manual and e['type']=='barcode' and not e.get('source') and not e.get('bls_code'):
+        with db() as c:local=manual_ingredients.find_barcode(c,e['barcode'])
+        if local:e.update(type='manual',manual_id=local['id'],manual_snapshot=local,barcode_origin='manual')
     food = None
     if e.get('imported_nutrition') and not any(e.get(k) for k in ('bls_code','manual_id','barcode')):
         snapshot=e['imported_nutrition']

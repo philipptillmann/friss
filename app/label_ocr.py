@@ -4,7 +4,8 @@ import math
 import re
 import subprocess
 import warnings
-from fastapi import Depends,HTTPException,Request
+from fastapi import Depends,HTTPException,Request,Query
+from typing import Literal
 from PIL import Image,ImageOps,UnidentifiedImageError
 from starlette.concurrency import run_in_threadpool
 
@@ -27,6 +28,21 @@ LABELS=[
  (r'eisen|iron','dietaryIron','mg'),
  (r'zink|zinc','dietaryZinc','mg'),
  (r'kalium|potassium','dietaryPotassium','mg'),
+ (r'vitamin\s+a','dietaryVitaminA','mcg'),
+ (r'vitamin\s+b1|thiamin','dietaryThiamin','mg'),
+ (r'vitamin\s+b2|riboflavin','dietaryRiboflavin','mg'),
+ (r'vitamin\s+b3|niacin','dietaryNiacin','mg'),
+ (r'vitamin\s+b5|pantothens[aä]ure|pantothenic\s+acid','dietaryPantothenicAcid','mg'),
+ (r'vitamin\s+b7|biotin','dietaryBiotin','mcg'),
+ (r'fols[aä]ure|folic\s+acid|folate|folat','dietaryFolate','mcg'),
+ (r'phosphor|phosphorus','dietaryPhosphorus','mg'),
+ (r'chlorid|chloride','dietaryChloride','mg'),
+ (r'kupfer|copper','dietaryCopper','mg'),
+ (r'jod|iodine','dietaryIodine','mcg'),
+ (r'selen|selenium','dietarySelenium','mcg'),
+ (r'mangan|manganese','dietaryManganese','mg'),
+ (r'chrom|chromium','dietaryChromium','mcg'),
+ (r'molybd[aä]n|molybdenum','dietaryMolybdenum','mcg'),
  (r'vitamin\s+b12','dietaryVitaminB12','mcg'),
  (r'vitamin\s+b6','dietaryVitaminB6','mg'),
  (r'vitamin\s+c','dietaryVitaminC','mg'),
@@ -37,13 +53,21 @@ LABELS=[
 MASS={'g':1,'mg':.001,'mcg':.000001,'µg':.000001,'μg':.000001,'ug':.000001}
 VALUE=r'(?<![\d.,])([0-9]+(?:[.,][0-9]+)?)\s*(kcal|kj|mcg|mg|µg|μg|ug|g)\b'
 
-def parse(text):
+def parse(text,reference_amount=None,reference_unit="g"):
+    if reference_amount is None:reference_unit="g"
     text=text[:30000]
     normalized=text.casefold().replace('\u00a0',' ')
-    # A fixed, readable 100g column is required. Never mistake portion or US
-    # daily-value columns for the per-100g basis.
+    # Default to an explicit 100g column. A caller may confirm another serving
+    # basis, but cannot override a conflicting fixed column or US carbs.
     basis=bool(re.search(r'\b100\s*g\b',normalized))
     unsafe=bool(re.search(r'\b100\s*ml\b|nutrition\s+facts|total\s+carbohydrate|(?:per|pro|je)\s+(?:portion|serving)',normalized))
+    override=reference_amount is not None
+    if override:
+        if not math.isfinite(reference_amount) or reference_amount<=0 or reference_unit not in ('g','ml'):raise HTTPException(422,'Invalid label reference amount')
+        declared=re.findall(r'\b100\s*(ml|g)\b',normalized)
+        # Never override a conflicting fixed column or reinterpret US carbs.
+        unsafe=bool(re.search(r'nutrition\s+facts|total\s+carbohydrate',normalized)) or any(reference_amount!=100 or unit!=reference_unit for unit in declared)
+        basis=True
     if not basis or unsafe:
         return {'text':text,'nutrients':{},'basis':'unconfirmed','warnings':['Use a label with a clearly readable per-100-g column. Per-serving, US Nutrition Facts and per-100-ml labels need manual conversion.']}
     nutrients={};problems=[];salt=None
@@ -74,13 +98,18 @@ def parse(text):
             if re.search(r'\b(?:'+pattern+r')\b',line):
                 amount=value*MASS[unit]/MASS[target]
                 # A macronutrient cannot exceed the entire 100g sample.
-                if target=='g' and amount>100:break
+                if target=='g' and reference_unit=='g' and amount>(reference_amount or 100):break
                 add(key,amount,target);break
     if salt is not None and 'dietarySodium' not in nutrients:
         add('dietarySodium',salt/2.5*1000,'mg')
-    return {'text':text,'basis':'100g','nutrients':nutrients,'warnings':['OCR suggestions must be checked against the package. Missing, ambiguous columns and less-than values are left blank. Salt is converted to sodium using salt / 2.5.']}
+    factor=100/reference_amount if override else 1
+    if override:
+        for n in nutrients.values():
+            n['value']*=factor
+            if not math.isfinite(n['value']):raise HTTPException(422,'Label reference amount is too small')
+    return {'text':text,'basis':'100'+reference_unit,'basis_unit':reference_unit,'reference_amount':reference_amount or 100,'nutrients':nutrients,'warnings':['OCR suggestions must be checked against the package. Missing, ambiguous columns and less-than values are left blank. Salt is converted to sodium using salt / 2.5.']}
 
-def scan(data):
+def scan(data,reference_amount=None,reference_unit="g"):
     try:
         with warnings.catch_warnings():
             warnings.simplefilter('error',Image.DecompressionBombWarning)
@@ -99,13 +128,13 @@ def scan(data):
     if result.returncode:raise HTTPException(422,'OCR could not read this image')
     text=result.stdout.decode('utf-8',errors='replace').strip()
     if not text:raise HTTPException(422,'No label text recognized. Try a sharper photo.')
-    return parse(text)
+    return parse(text,reference_amount,reference_unit)
 
 def install(app,auth):
     @app.post('/manual-ingredients/scan-label',dependencies=[Depends(auth)])
-    async def preview(request:Request):
+    async def preview(request:Request,reference_amount:float|None=Query(default=None,gt=0,le=100000,allow_inf_nan=False),reference_unit:Literal['g','ml']='g'):
         data=bytearray()
         async for chunk in request.stream():
             data.extend(chunk)
             if len(data)>MAX_BYTES:raise HTTPException(413,'Image exceeds 10 MiB')
-        return await run_in_threadpool(scan,bytes(data))
+        return await run_in_threadpool(scan,bytes(data),reference_amount,reference_unit)

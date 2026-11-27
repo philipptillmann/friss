@@ -7,14 +7,16 @@ Object.assign(words.en,{labelUpload:'Upload label image',labelScan:'Photograph n
  async function scan(input){
  const file=input.files[0];input.value='';if(!file||manualImportPending||!manualFieldsReady)return;
  if(manualHasDraft()&&!confirm(t('manualImportReplace')))return;
+ const context={item:manualEditing?.id?manualEditing:null,name_de:$('manualNameDe').value||'',name_en:$('manualNameEn').value||'',barcodes:typeof readManualBarcodes==='function'?readManualBarcodes():[],notes:$('manualNotes').value||''};
+ let reference='';try{reference=typeof labelReferenceQuery==='function'?labelReferenceQuery():'';}catch(e){$('labelScanStatus').textContent=e.message;return;}
  const mine=++sequence,generation=++manualImportGeneration;manualImportPending=true;$('labelScanButton').disabled=true;$('labelUploadButton').disabled=true;$('manualImportButton').disabled=true;$('labelScanStatus').textContent=t('labelScanWorking');$('labelScanReview').hidden=true;
  try{
- const image=await barcodeImage(file);const result=await api('/manual-ingredients/scan-label',{method:'POST',body:image});
+ const image=await barcodeImage(file);const result=await api('/manual-ingredients/scan-label'+reference,{method:'POST',body:image});
  if(mine!==sequence||generation!==manualImportGeneration||$('dashboard').hidden)return;
  $('labelScanText').textContent=result.text;$('labelScanReview').hidden=false;
  if(!Object.keys(result.nutrients).length){$('labelScanStatus').textContent=t('labelScanUnknown');return;}
- editManual({name_de:'',name_en:'',notes:'Nutrition label OCR (review required)\n'+result.warnings.join('\n')+'\n\n'+result.text.slice(0,8000),nutrients:result.nutrients});
- manualEditing=null;manualSource=null;manualDraft=null;$('manualEditorTitle').textContent=t('newManual');$('labelScanStatus').textContent=t('labelScanDone');$('manualForm').scrollIntoView({behavior:'smooth',block:'start'});
+ editManual({...context.item,name_de:context.name_de,name_en:context.name_en,barcodes:context.barcodes,basis_unit:result.basis_unit||'g',notes:(context.notes+'\nNutrition label OCR (review required)\nReference: '+(result.reference_amount||100)+' '+(result.basis_unit||'g')+'\n'+result.warnings.join('\n')+'\n\n'+result.text.slice(0,8000)).slice(0,10000),nutrients:result.nutrients});
+ manualEditing=context.item;manualSource=null;manualDraft=null;$('manualEditorTitle').textContent=t(context.item?'editManual':'newManual');$('manualAmend').hidden=!context.item;$('manualSaveHint').hidden=!context.item;$('manualSave').textContent=t(context.item?'saveFuture':'save');$('labelScanStatus').textContent=t('labelScanDone');$('manualForm').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(e){if(mine===sequence&&generation===manualImportGeneration)$('labelScanStatus').textContent=t('labelScanError')+' '+e.message;}
  finally{if(mine===sequence){manualImportPending=false;$('labelScanButton').disabled=false;$('labelUploadButton').disabled=false;$('manualImportButton').disabled=!manualFieldsReady;}}
  }

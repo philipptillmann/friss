@@ -1,4 +1,4 @@
-"""User-entered food definitions with explicit per-100-g nutrient units."""
+"""Own foods with per-100-g/ml nutrient units and unique barcode links."""
 import json
 from datetime import datetime,timezone
 from typing import Literal
@@ -49,9 +49,12 @@ class ManualEdit(BaseModel):
     source:ImportSource|None=None
     ethanol_g_per100:float|None=Field(default=None,ge=0,le=100,allow_inf_nan=False)
     version:int=Field(ge=0)
+    barcodes:list[str]=Field(default_factory=list,max_length=50)
     @model_validator(mode='after')
     def valid(self):
         if self.source and self.source.basis_ml and 'basis_unit' not in self.model_fields_set:self.basis_unit='ml'
+        if len(set(self.barcodes))!=len(self.barcodes):raise ValueError('Duplicate barcode')
+        if any(not b.isascii() or not b.isdigit() or not 8<=len(b)<=14 for b in self.barcodes):raise ValueError('Barcodes need 8–14 digits; preserve leading zeros')
         self.name_de=self.name_de.strip();self.name_en=self.name_en.strip() or self.name_de
         if not self.name_de:raise ValueError('Name required')
         if not self.nutrients and self.ethanol_g_per100 is None:raise ValueError('Enter at least one nutrient')
@@ -72,7 +75,23 @@ def load(db,id):
     if not row:raise HTTPException(404,'Manual ingredient not found')
     return json.loads(row['payload'])
 
+def find_barcode(c,barcode):
+    for row in c.execute('SELECT payload FROM manual_ingredients'):
+        item=json.loads(row['payload'])
+        if barcode in item.get('barcodes',[]):return item
+    return None
+
+def check_barcodes(c,value):
+    for code in value.get('barcodes',[]):
+        linked=find_barcode(c,code)
+        if linked and linked['id']!=value['id']:raise HTTPException(409,'Barcode '+code+' already belongs to '+linked['name_de'])
+
 def install(app,db,auth,amend=None):
+    @app.get('/barcodes/{barcode}',dependencies=[Depends(auth)])
+    async def barcode_lookup(barcode:str):
+        if not barcode.isascii() or not barcode.isdigit() or not 8<=len(barcode)<=14:raise HTTPException(422,'Barcode needs 8–14 digits')
+        with db() as c:food=find_barcode(c,barcode)
+        return {'barcode':barcode,'source':'manual' if food else 'off','food':food}
     @app.get('/manual-ingredients/schema',dependencies=[Depends(auth)])
     async def schema():
         macros={'dietaryProtein','dietaryCarbohydrates','dietaryFiber','dietarySugar','dietaryFatTotal','dietaryFatSaturated','dietaryFatMonounsaturated','dietaryFatPolyunsaturated'}
@@ -90,8 +109,9 @@ def install(app,db,auth,amend=None):
             row=c.execute('SELECT payload FROM manual_ingredients WHERE id=?',(str(body.id),)).fetchone()
             if row:
                 old=json.loads(row['payload'])
-                if any(old.get(k)!=v for k,v in value.items()):raise HTTPException(409,'ID already used')
+                if any(old.get(k,[] if k=='barcodes' else None)!=v for k,v in value.items()):raise HTTPException(409,'ID already used')
                 return old
+            check_barcodes(c,value)
             value['updated_at']=datetime.now(timezone.utc).isoformat()
             c.execute('INSERT INTO manual_ingredients VALUES(?,?)',(value['id'],json.dumps(value)))
         return value
@@ -103,8 +123,11 @@ def install(app,db,auth,amend=None):
             c.execute('BEGIN IMMEDIATE')
             row=c.execute('SELECT payload FROM manual_ingredients WHERE id=?',(str(id),)).fetchone()
             if not row:raise HTTPException(404,'Manual ingredient not found')
-            if json.loads(row['payload'])['version']!=body.version:raise HTTPException(409,'Ingredient changed; reload first')
+            old=json.loads(row['payload'])
+            if 'barcodes' not in body.model_fields_set:value['barcodes']=old.get('barcodes',[])
+            if old['version']!=body.version:raise HTTPException(409,'Ingredient changed; reload first')
             value.update(id=str(id),version=body.version+1,updated_at=datetime.now(timezone.utc).isoformat())
+            check_barcodes(c,value)
             if body.amend_existing:
                 if amend is None:raise HTTPException(503,'Retrospective correction unavailable')
                 counts=await amend(c,value)

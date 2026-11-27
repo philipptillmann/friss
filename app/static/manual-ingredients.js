@@ -55,11 +55,11 @@ function buildManualFields(){
 }
 function renderManualList(){
  $('manualList').replaceChildren();const query=$('manualFilter').value.trim().toLocaleLowerCase();
- const filtered=manualItems.filter(i=>(i.name_de+' '+i.name_en).toLocaleLowerCase().includes(query));
+ const filtered=manualItems.filter(i=>(i.name_de+' '+i.name_en+' '+(i.barcodes||[]).join(' ')).toLocaleLowerCase().includes(query));
  if(!filtered.length)$('manualList').textContent=t('noManual');
  for(const item of filtered){
  const row=document.createElement('div');row.className='favoriteRow';const title=document.createElement('strong');title.textContent=manualName(item);
- const info=document.createElement('p');const energy=item.nutrients.dietaryEnergyConsumed;info.className='note';info.textContent=manualBasisLabel(item)+(energy?' · '+formatHome(energy.value)+' kcal':'');
+ const info=document.createElement('p');const energy=item.nutrients.dietaryEnergyConsumed;info.className='note';info.textContent=(item.barcodes?.length?item.barcodes.join(', ')+' · ':'')+manualBasisLabel(item)+(energy?' · '+formatHome(energy.value)+' kcal':'');
  const actions=document.createElement('div');actions.className='bacActions';
  const edit=document.createElement('button');edit.type='button';edit.textContent=t('edit');edit.onclick=()=>editManual(item);
  const remove=document.createElement('button');remove.type='button';remove.className='danger';remove.textContent=t('deleteEntry');remove.onclick=()=>deleteManual(item);
@@ -79,14 +79,14 @@ function editManual(item=null){
  manualEditing=item;manualDraft=null;$('manualForm').reset();$('manualBasis').value=item?.basis_unit||(item?.source?.basis_ml?'ml':'g');updateManualBasisUI();$('manualAmend').hidden=!item;$('manualSaveHint').hidden=!item;$('manualSave').textContent=t(item?'saveFuture':'save');$('manualEditorTitle').textContent=t(item?'editManual':'newManual');
  $('manualNameDe').value=item?.name_de||'';$('manualNameEn').value=item?.name_en||'';$('manualNotes').value=item?.notes||'';$('manualEthanol').value=item?.ethanol_g_per100??'';
  for(const field of manualSchema){$('manualValue-'+field.key).value=item?.nutrients[field.key]?.value??'';$('manualUnit-'+field.key).value=item?.nutrients[field.key]?.unit||field.unit;}
- updateManualSaltHint();$('manualNameDe').focus();
+ if(typeof setManualBarcodes==='function')setManualBarcodes(item?.barcodes||[]);updateManualSaltHint();$('manualNameDe').focus();
 }
 $('manualForm').onsubmit=async event=>{
  event.preventDefault();if(!manualFieldsReady)return;const button=event.submitter||$('manualSave'),amend=!!manualEditing&&button.id==='manualAmend';if(amend&&!confirm(t('manualAmendConfirm')))return;$('manualSave').disabled=true;$('manualAmend').disabled=true;
  try{
  const nutrients={};for(const field of manualSchema){const input=$('manualValue-'+field.key);if(input.value!=='')nutrients[field.key]={value:Number(input.value),unit:$('manualUnit-'+field.key).value};}
  const alcohol=$('manualEthanol').value;if(!Object.keys(nutrients).length&&alcohol==='')throw Error(t('manualNeedNutrient'));
- const body={basis_unit:$('manualBasis').value||'g',name_de:$('manualNameDe').value.trim(),name_en:$('manualNameEn').value.trim(),notes:$('manualNotes').value,nutrients,ethanol_g_per100:alcohol===''?null:Number(alcohol),version:manualEditing?.version??0,source:manualSource};
+ const body={barcodes:typeof readManualBarcodes==='function'?readManualBarcodes():manualEditing?.barcodes||[],basis_unit:$('manualBasis').value||'g',name_de:$('manualNameDe').value.trim(),name_en:$('manualNameEn').value.trim(),notes:$('manualNotes').value,nutrients,ethanol_g_per100:alcohol===''?null:Number(alcohol),version:manualEditing?.version??0,source:manualSource};
  let count=0;if(manualEditing){const result=await api('/manual-ingredients/'+manualEditing.id,{method:'PUT',body:JSON.stringify({...body,amend_existing:amend})});count=result.amended_entries||0;}
  else{manualDraft??=uuid();await api('/manual-ingredients',{method:'POST',body:JSON.stringify({id:manualDraft,...body})});}
  editManual();await loadManualIngredients();if(amend)await refresh();message(t('saved')+(amend?' · '+t('manualAmendedCount')+': '+count:''));

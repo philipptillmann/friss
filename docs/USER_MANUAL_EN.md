@@ -1,6 +1,6 @@
 # Friss user manual
 
-**For version 1.46.1 · Updated 26 November 2026**
+**For version 1.47.0 · Updated 27 November 2026**
 [Deutsches Handbuch](USER_MANUAL_DE.md) · [Project overview](../README.md)
 
 Friss is a self-hosted food and drink diary. Your server stores entries, original inputs, recipes and nutrient data. You can use the browser on a computer or add the site to your iPhone Home Screen. It is a web app, not a native iPhone app. Apple Health writes require a separate iPhone Shortcut.
@@ -35,6 +35,8 @@ Friss is a self-hosted food and drink diary. Your server stores entries, origina
 21. [Refresh empty Open Food Facts nutrition](#21-refresh-empty-open-food-facts-nutrition)
 
 22. [Open Food Facts vitamins and minerals](#22-open-food-facts-vitamins-and-minerals)
+
+23. [Manual barcodes and label reference amounts](#23-manual-barcodes-and-label-reference-amounts)
 
 ## 1. Getting started
 
@@ -186,7 +188,7 @@ Imports depend on the source site's availability and structure. [FDDB guide](FDD
 
 Choose **Photograph nutrition label** or **Upload label image**. Use a sharp, straight image containing a clear **per-100-g** column. Friss runs German/English OCR on your server and fills suggestions; enter the name and check every value and unit before saving.
 
-This OCR flow does not automatically interpret per-serving, US Nutrition Facts or per-100-ml tables. Those require manual entry/conversion. Recognized salt may be converted to sodium and kJ to kcal. The scan image itself is not archived by this flow; recognized text is retained in notes. This is label OCR, not AI recognition of a plated meal.
+For a per-serving/tablet or per-100-ml table, explicitly confirm the reference amount before scanning (section 23). US carbohydrate labels and ambiguous columns still require manual review. Recognized salt may be converted to sodium and kJ to kcal. The scan image itself is not archived by this flow; recognized text is retained in notes. This is label OCR, not AI recognition of a plated meal.
 
 ### Changing a saved manual food
 
@@ -367,3 +369,9 @@ Only the selected entry/ingredient is recalculated at its saved amount/time. Fai
 OFF imports include supported vitamins, minerals, cholesterol and unsaturated fats when present. Existing entries can gain them through **Refresh from Open Food Facts** in details; new entries use the expanded mapping automatically. Old snapshots do not silently change when viewed.
 
 Values use the source per-100-g basis and consumed gram weight. Do not assume supplement quantities are per tablet. [Full bilingual explanation and example product](OFF_MICRONUTRIENTS.md).
+
+## 23. Manual barcodes and label reference amounts
+
+Manual foods can store barcodes, typed or photographed. Normal barcode capture checks these before Open Food Facts and uses the matched food's g/ml basis. Explicit Barcode → BLS stays separate; previous entries keep their snapshots.
+
+Photograph/upload a label in Manual. Barcode/name remain; review OCR and save. For per-tablet labels explicitly enter a known reference such as 6 g; values normalize to 100 g, so logging 6 g reproduces the label amount. No weight/density is inferred. [Full bilingual guide and API](MANUAL_BARCODES_OCR.md).

@@ -1,11 +1,11 @@
-# Friss · Version 1.46.1
+# Friss · Version 1.47.0
 
 Self-hosted food and drink tracking for Debian/Docker, web browsers and iPhone Shortcuts. Includes BLS/Open Food Facts search, recipes, manual foods, statistics, JSON imports, backups and Apple Health export preparation.
 
 ## User manuals / Benutzerhandbücher
 
-- **[English user manual — current version 1.46.1](docs/USER_MANUAL_EN.md)**
-- **[Deutsches Benutzerhandbuch — aktuelle Version 1.46.1](docs/USER_MANUAL_DE.md)**
+- **[English user manual — current version 1.47.0](docs/USER_MANUAL_EN.md)**
+- **[Deutsches Benutzerhandbuch — aktuelle Version 1.47.0](docs/USER_MANUAL_DE.md)**
 
 The manuals describe current workflows. The sections below also preserve historical release notes and API setup examples; use the manuals when older instructions differ.
 Die Handbücher beschreiben die aktuellen Abläufe. Die folgenden Abschnitte enthalten auch historische Versionshinweise und API-Beispiele; bei abweichenden älteren Angaben gelten die Handbücher.
@@ -526,3 +526,7 @@ A red exclamation beside the OFF label marks missing/all-zero source nutrition. 
 ### OFF vitamins and minerals (v1.46.1)
 
 OFF imports now include supported micronutrients and additional fats/cholesterol. For existing products, use **Refresh from Open Food Facts** in details. Old snapshots/Health history are not silently changed. [English/German unit and supplement example guide](docs/OFF_MICRONUTRIENTS.md).
+
+### Manual-food barcodes and OCR (v1.47.0)
+
+Link barcodes to your own foods: normal capture checks these before OFF. Photograph/upload a nutrition label, retain barcode/name, review OCR and optionally confirm a per-tablet/serving reference such as 6 g. [German/English workflow and API](docs/MANUAL_BARCODES_OCR.md).

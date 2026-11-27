@@ -1,6 +1,6 @@
 # Friss – Benutzerhandbuch
 
-**Für Version 1.46.1 · Stand: 26. November 2026**
+**Für Version 1.47.0 · Stand: 27. November 2026**
 [English manual](USER_MANUAL_EN.md) · [Projektübersicht](../README.md)
 
 Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server speichert Einträge, Originaleingaben, Rezepte und Nährwertdaten. Du bedienst Friss im Browser am Computer oder über eine Verknüpfung auf dem iPhone-Home-Bildschirm. Friss ist eine Web-App, keine native iPhone-App. Zum Schreiben in Apple Health ist ein separater iPhone-Kurzbefehl erforderlich.
@@ -35,6 +35,8 @@ Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server 
 21. [Leere Open-Food-Facts-Nährwerte aktualisieren](#21-leere-open-food-facts-nährwerte-aktualisieren)
 
 22. [Open-Food-Facts-Vitamine und Mineralstoffe](#22-open-food-facts-vitamine-und-mineralstoffe)
+
+23. [Manuelle Barcodes und Etiketten-Bezugsmengen](#23-manuelle-barcodes-und-etiketten-bezugsmengen)
 
 ## 1. Erste Schritte
 
@@ -186,7 +188,7 @@ Importe hängen von Erreichbarkeit und Aufbau der jeweiligen Website ab. [FDDB-A
 
 Wähle **Nährwertetikett fotografieren** oder **Etikettbild hochladen**. Verwende eine scharfe, gerade Aufnahme mit eindeutiger **100-g-Spalte**. Friss führt deutsche/englische Texterkennung auf deinem Server aus und füllt Vorschläge ein. Namen ergänzen und alle Zahlen/Einheiten vor dem Speichern prüfen.
 
-Dieser OCR-Ablauf interpretiert Portionsangaben, US Nutrition Facts und 100-ml-Tabellen nicht automatisch. Sie erfordern manuelle Eingabe/Umrechnung. Erkanntes Salz kann zu Natrium, kJ können zu kcal umgerechnet werden. Das Scanbild selbst wird dabei nicht archiviert; erkannter Text bleibt in den Notizen. Das ist Etiketten-Texterkennung, keine KI-Erkennung eines fotografierten Gerichts.
+Für Portions-/Tablettenangaben oder 100-ml-Tabellen die Bezugsmenge vor dem Scannen ausdrücklich bestätigen (Abschnitt 23). US-Kohlenhydratangaben und mehrdeutige Spalten weiterhin manuell prüfen. Erkanntes Salz kann zu Natrium, kJ können zu kcal umgerechnet werden. Das Scanbild selbst wird dabei nicht archiviert; erkannter Text bleibt in den Notizen. Das ist Etiketten-Texterkennung, keine KI-Erkennung eines fotografierten Gerichts.
 
 ### Gespeicherte manuelle Lebensmittel ändern
 
@@ -367,3 +369,9 @@ Nur der gewählte Eintrag/die Zutat wird mit gespeicherter Menge/Zeit neu berech
 OFF-Importe enthalten vorhandene unterstützte Vitamine, Mineralstoffe, Cholesterin und ungesättigte Fette. Bestehende Einträge über **Aus Open Food Facts aktualisieren** in den Details ergänzen; neue Einträge verwenden die erweiterte Zuordnung automatisch. Alte Momentaufnahmen ändern sich nicht still beim Anzeigen.
 
 Es gelten die Quellenbasis pro 100 g und die verzehrte Grammmenge. Bei Supplementen nicht pauschal Werte pro Tablette annehmen. [Zweisprachige Erklärung und Produktbeispiel](OFF_MICRONUTRIENTS.md).
+
+## 23. Manuelle Barcodes und Etiketten-Bezugsmengen
+
+Manuelle Lebensmittel können eingetippte/fotografierte Barcodes erhalten. Normaler Barcode-Verzehr prüft sie vor Open Food Facts und verwendet ihre g-/ml-Basis. Barcode → BLS bleibt getrennt; alte Einträge behalten ihre Momentaufnahme.
+
+Etikett unter Manuell fotografieren/hochladen, OCR prüfen und speichern. Barcode/Name bleiben erhalten. Bei Tabletten bestätigte Bezugsmenge wie 6 g angeben: Friss normalisiert auf 100 g; Verzehr von 6 g ergibt die Etikettenmenge. Gewicht/Dichte werden nicht geraten. [Vollständige zweisprachige Anleitung und API](MANUAL_BARCODES_OCR.md).

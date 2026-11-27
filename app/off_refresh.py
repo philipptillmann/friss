@@ -44,7 +44,7 @@ def install(app,db,auth,load,process,data_dir):
         if old.get('revision',1)!=body.revision:raise HTTPException(409,'Entry changed; reload before refreshing')
         with db() as c:export_state(c,str(id),old)
         e=copy.deepcopy(old);e.pop('food',None);e.pop('source',None)
-        try:await process(e,reuse_off=False)
+        try:await process(e,reuse_off=False,prefer_manual=False)
         except (TypeError,ValueError,KeyError,AttributeError):raise HTTPException(502,'Invalid Open Food Facts response; saved entry unchanged')
         if e.get('status')=='failed' or not is_off(e) or not isinstance(e.get('food'),dict) or not e['food']:
             raise HTTPException(502,'Open Food Facts unavailable or product not found; saved entry unchanged')

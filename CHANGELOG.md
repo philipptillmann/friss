@@ -1,3 +1,10 @@
+## 1.47.0 — Own-food barcodes and label OCR workflow
+
+- #94: Store unique barcode lists on manual foods; normal barcode capture prefers their snapshot over Open Food Facts in meals/recipe ingredients, with local lookup feedback and correct g/ml basis. Explicit Barcode → BLS stays separate; old snapshots and OFF refresh retain their source.
+- Add typed/photo barcode capture in Manual and retain barcode/name during label OCR. Editing an existing food stays in that editor; collisions are rejected, links survive old-client updates and backups.
+- Extend label recognition for vitamins/minerals and allow an explicitly confirmed serving reference (e.g. 6 g per tablet or 100 ml), normalized to 100 g/ml without inferred weights/density. Preview remains review-only; ambiguous/conflicting columns stay blank.
+- Document German/English workflow/API and add regression tests for priority, snapshots, units, uniqueness and OCR reference conversion.
+
 ## 1.46.1 — Import OFF vitamins and minerals
 
 - #93: Extend Open Food Facts mapping to supported micronutrients, unsaturated fats, cholesterol and food water. Correct the omission reported for supplement 4316268448871.
