@@ -1,6 +1,6 @@
 # Friss user manual
 
-**For version 1.47.0 · Updated 27 November 2026**
+**For version 1.47.1 · Updated 28 November 2026**
 [Deutsches Handbuch](USER_MANUAL_DE.md) · [Project overview](../README.md)
 
 Friss is a self-hosted food and drink diary. Your server stores entries, original inputs, recipes and nutrient data. You can use the browser on a computer or add the site to your iPhone Home Screen. It is a web app, not a native iPhone app. Apple Health writes require a separate iPhone Shortcut.
@@ -37,6 +37,8 @@ Friss is a self-hosted food and drink diary. Your server stores entries, origina
 22. [Open Food Facts vitamins and minerals](#22-open-food-facts-vitamins-and-minerals)
 
 23. [Manual barcodes and label reference amounts](#23-manual-barcodes-and-label-reference-amounts)
+
+24. [Recover a text-only OCR result](#24-recover-a-text-only-ocr-result)
 
 ## 1. Getting started
 
@@ -375,3 +377,9 @@ Values use the source per-100-g basis and consumed gram weight. Do not assume su
 Manual foods can store barcodes, typed or photographed. Normal barcode capture checks these before Open Food Facts and uses the matched food's g/ml basis. Explicit Barcode → BLS stays separate; previous entries keep their snapshots.
 
 Photograph/upload a label in Manual. Barcode/name remain; review OCR and save. For per-tablet labels explicitly enter a known reference such as 6 g; values normalize to 100 g, so logging 6 g reproduces the label amount. No weight/density is inferred. [Full bilingual guide and API](MANUAL_BARCODES_OCR.md).
+
+## 24. Recover a text-only OCR result
+
+If OCR returns text but no nutrients, read the specific reason and confirm the actual reference amount. The recognized-text section opens automatically. Compare/correct its editable text against the package, then press **Reprocess text**; no new photo is needed. Explicit kcal now wins over a separate kJ line.
+
+Missing units, unclear decimals and < / > values are not guessed. Name/barcodes remain; review the filled fields before saving. [Detailed recovery guide and API](OCR_RETRY.md).

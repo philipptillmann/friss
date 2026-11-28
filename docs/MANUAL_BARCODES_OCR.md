@@ -60,3 +60,7 @@ Leave the OCR reference amount blank for a clear per-100-g column. For a known p
 Ambiguous columns, conflicting fixed bases and US total-carbohydrate labels are not guessed. Missing values remain blank and OCR requires human checking. Recognized text/reference information stays in notes; scan image files are processed but not archived by this OCR flow.
 
 The existing manual-food create/update APIs accept `barcodes`. Omitted barcodes on update are preserved; explicit empty list removes them. `GET /barcodes/{code}` exposes local matching without a remote request. `POST /manual-ingredients/scan-label?reference_amount=6&reference_unit=g` accepts image bytes and returns a review-only normalized draft. All endpoints require authentication. Manual barcode links are included automatically in existing JSON/ZIP backups.
+
+## Ab v1.47.1 / From v1.47.1
+
+Bei Text ohne Nährwertübernahme: Bezugsmenge bestätigen, OCR-Text korrigieren und **Text erneut auswerten**. No new photo is needed; the draft remains review-only. [Anleitung / Guide](OCR_RETRY.md).

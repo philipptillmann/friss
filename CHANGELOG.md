@@ -1,3 +1,9 @@
+## 1.47.1 — Recover text-only OCR results
+
+- #95: Explain why recognized label text could not produce nutrients, including missing reference amounts, conflicting columns, unreadable units and bound values.
+- Add editable recognized text and a reprocess button/API so a confirmed 100-g/ml or serving basis and corrected OCR text can be applied without uploading another photo. Preserve name/barcodes/editor, keep drafts read-only until save and reject stale responses.
+- Prefer explicit kcal across separate energy lines instead of treating kJ/kcal as conflicting nutrients. Add the user's exact German OCR regression and end-to-end retry coverage.
+
 ## 1.47.0 — Own-food barcodes and label OCR workflow
 
 - #94: Store unique barcode lists on manual foods; normal barcode capture prefers their snapshot over Open Food Facts in meals/recipe ingredients, with local lookup feedback and correct g/ml basis. Explicit Barcode → BLS stays separate; old snapshots and OFF refresh retain their source.

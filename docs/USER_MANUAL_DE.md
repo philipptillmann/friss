@@ -1,6 +1,6 @@
 # Friss – Benutzerhandbuch
 
-**Für Version 1.47.0 · Stand: 27. November 2026**
+**Für Version 1.47.1 · Stand: 28. November 2026**
 [English manual](USER_MANUAL_EN.md) · [Projektübersicht](../README.md)
 
 Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server speichert Einträge, Originaleingaben, Rezepte und Nährwertdaten. Du bedienst Friss im Browser am Computer oder über eine Verknüpfung auf dem iPhone-Home-Bildschirm. Friss ist eine Web-App, keine native iPhone-App. Zum Schreiben in Apple Health ist ein separater iPhone-Kurzbefehl erforderlich.
@@ -37,6 +37,8 @@ Friss ist ein selbst gehostetes Ernährungs- und Getränketagebuch. Dein Server 
 22. [Open-Food-Facts-Vitamine und Mineralstoffe](#22-open-food-facts-vitamine-und-mineralstoffe)
 
 23. [Manuelle Barcodes und Etiketten-Bezugsmengen](#23-manuelle-barcodes-und-etiketten-bezugsmengen)
+
+24. [OCR-Text ohne Nährwerte nachbearbeiten](#24-ocr-text-ohne-nährwerte-nachbearbeiten)
 
 ## 1. Erste Schritte
 
@@ -375,3 +377,9 @@ Es gelten die Quellenbasis pro 100 g und die verzehrte Grammmenge. Bei Supplemen
 Manuelle Lebensmittel können eingetippte/fotografierte Barcodes erhalten. Normaler Barcode-Verzehr prüft sie vor Open Food Facts und verwendet ihre g-/ml-Basis. Barcode → BLS bleibt getrennt; alte Einträge behalten ihre Momentaufnahme.
 
 Etikett unter Manuell fotografieren/hochladen, OCR prüfen und speichern. Barcode/Name bleiben erhalten. Bei Tabletten bestätigte Bezugsmenge wie 6 g angeben: Friss normalisiert auf 100 g; Verzehr von 6 g ergibt die Etikettenmenge. Gewicht/Dichte werden nicht geraten. [Vollständige zweisprachige Anleitung und API](MANUAL_BARCODES_OCR.md).
+
+## 24. OCR-Text ohne Nährwerte nachbearbeiten
+
+Wenn OCR nur Text liefert, Ursache lesen und tatsächliche Bezugsmenge bestätigen. **Erkannter Text** öffnet sich automatisch. Bearbeitbaren Text mit dem Etikett vergleichen/korrigieren und **Text erneut auswerten** wählen; kein neues Foto nötig. Ausdrückliche kcal haben Vorrang vor einer separaten kJ-Zeile.
+
+Fehlende Einheiten, unklare Dezimalstellen und < / > Angaben werden nicht geraten. Name/Barcodes bleiben erhalten; gefüllte Werte vor dem Speichern prüfen. [Ausführliche Anleitung und API](OCR_RETRY.md).

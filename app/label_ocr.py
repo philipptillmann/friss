@@ -6,6 +6,7 @@ import subprocess
 import warnings
 from fastapi import Depends,HTTPException,Request,Query
 from typing import Literal
+from pydantic import BaseModel,Field
 from PIL import Image,ImageOps,UnidentifiedImageError
 from starlette.concurrency import run_in_threadpool
 
@@ -69,27 +70,38 @@ def parse(text,reference_amount=None,reference_unit="g"):
         unsafe=bool(re.search(r'nutrition\s+facts|total\s+carbohydrate',normalized)) or any(reference_amount!=100 or unit!=reference_unit for unit in declared)
         basis=True
     if not basis or unsafe:
-        return {'text':text,'nutrients':{},'basis':'unconfirmed','warnings':['Use a label with a clearly readable per-100-g column. Per-serving, US Nutrition Facts and per-100-ml labels need manual conversion.']}
-    nutrients={};problems=[];salt=None
+        issue='us_label' if re.search(r'nutrition\s+facts|total\s+carbohydrate',normalized) else 'reference_conflict' if override else 'reference_required'
+        return {'text':text,'nutrients':{},'basis':'unconfirmed','issues':[issue],'warnings':['Confirm the label reference amount or correct the recognized text; conflicting columns and US total carbohydrates require manual review.']}
+
+    nutrients={};problems=[];salt=None;issues=[]
     def add(key,value,unit):
         if not math.isfinite(value) or value<0:return
         if key in nutrients and nutrients[key]!={'value':value,'unit':unit}:
-            nutrients.pop(key);problems.append(key)
+            nutrients.pop(key);problems.append(key);issues.append("conflicting_values")
         elif key not in problems:nutrients[key]={'value':value,'unit':unit}
     lines=[s.strip() for s in normalized.splitlines() if s.strip()]
+    energy_pattern=r'\b(?:energie|energy|brennwert|kalorien|calories)\b'
+    # Explicit kcal takes priority across the whole table, not just within a
+    # single line. Separate kJ and kcal declarations are not conflicting samples.
+    explicit_kcal=any(re.search(energy_pattern,line) and any(m[2]=='kcal' for m in re.finditer(VALUE,line)) and not re.search(r'[<>≤≥]',line) for line in lines)
     for index,line in enumerate(lines):
         # Explicit tables with multiple quantity columns are ambiguous after OCR.
         # Do not choose a column based on visual position lost in plain text.
         found=list(re.finditer(VALUE,line))
         if not found and index+1<len(lines) and not re.search(r'[<>≤≥]',line):
             found=list(re.finditer(VALUE,lines[index+1])) if re.match(r'^\d',lines[index+1]) else []
-        if re.search(r'[<>≤≥]',line):continue
-        if re.search(r'\b(?:energie|energy|brennwert|kalorien|calories)\b',line):
+        supported=bool(re.search(energy_pattern,line) or re.search(r'\b(?:salz|salt)\b',line) or any(re.search(r'\b(?:'+pattern+r')\b',line) for pattern,key,target in LABELS))
+        if re.search(r'[<>≤≥]',line):
+            if supported:issues.append('qualifier_values')
+            continue
+        if re.search(energy_pattern,line):
             kcal=[m for m in found if m[2]=='kcal'];kj=[m for m in found if m[2]=='kj']
             if len(kcal)==1:add('dietaryEnergyConsumed',float(kcal[0][1].replace(',','.')),'kcal')
-            elif not kcal and len(kj)==1:add('dietaryEnergyConsumed',float(kj[0][1].replace(',','.'))/4.184,'kcal')
+            elif not explicit_kcal and not kcal and len(kj)==1:add('dietaryEnergyConsumed',float(kj[0][1].replace(',','.'))/4.184,'kcal')
             continue
-        if len(found)!=1:continue
+        if len(found)!=1:
+            if supported:issues.append('ambiguous_or_missing_units')
+            continue
         m=found[0];value=float(m[1].replace(',','.'));unit=m[2]
         if unit not in MASS:continue
         if re.search(r'\b(?:salz|salt)\b',line):
@@ -98,7 +110,8 @@ def parse(text,reference_amount=None,reference_unit="g"):
             if re.search(r'\b(?:'+pattern+r')\b',line):
                 amount=value*MASS[unit]/MASS[target]
                 # A macronutrient cannot exceed the entire 100g sample.
-                if target=='g' and reference_unit=='g' and amount>(reference_amount or 100):break
+                if target=='g' and reference_unit=='g' and amount>(reference_amount or 100):
+                    issues.append('implausible_mass');break
                 add(key,amount,target);break
     if salt is not None and 'dietarySodium' not in nutrients:
         add('dietarySodium',salt/2.5*1000,'mg')
@@ -107,7 +120,8 @@ def parse(text,reference_amount=None,reference_unit="g"):
         for n in nutrients.values():
             n['value']*=factor
             if not math.isfinite(n['value']):raise HTTPException(422,'Label reference amount is too small')
-    return {'text':text,'basis':'100'+reference_unit,'basis_unit':reference_unit,'reference_amount':reference_amount or 100,'nutrients':nutrients,'warnings':['OCR suggestions must be checked against the package. Missing, ambiguous columns and less-than values are left blank. Salt is converted to sodium using salt / 2.5.']}
+    if not nutrients:issues.append('no_supported_values')
+    return {'text':text,'issues':list(dict.fromkeys(issues)),'basis':'100'+reference_unit,'basis_unit':reference_unit,'reference_amount':reference_amount or 100,'nutrients':nutrients,'warnings':['OCR suggestions must be checked against the package. Missing, ambiguous columns and less-than values are left blank. Salt is converted to sodium using salt / 2.5.']}
 
 def scan(data,reference_amount=None,reference_unit="g"):
     try:
@@ -130,7 +144,15 @@ def scan(data,reference_amount=None,reference_unit="g"):
     if not text:raise HTTPException(422,'No label text recognized. Try a sharper photo.')
     return parse(text,reference_amount,reference_unit)
 
+class TextPreview(BaseModel):
+    text:str=Field(min_length=1,max_length=30000)
+    reference_amount:float|None=Field(default=None,gt=0,le=100000,allow_inf_nan=False)
+    reference_unit:Literal['g','ml']='g'
+
 def install(app,auth):
+    @app.post('/manual-ingredients/parse-label',dependencies=[Depends(auth)])
+    async def text_preview(body:TextPreview):
+        return parse(body.text,body.reference_amount,body.reference_unit)
     @app.post('/manual-ingredients/scan-label',dependencies=[Depends(auth)])
     async def preview(request:Request,reference_amount:float|None=Query(default=None,gt=0,le=100000,allow_inf_nan=False),reference_unit:Literal['g','ml']='g'):
         data=bytearray()
